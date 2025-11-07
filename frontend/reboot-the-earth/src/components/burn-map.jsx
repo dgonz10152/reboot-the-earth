@@ -1,18 +1,23 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import L from "leaflet";
+import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 
-// Fix for default marker icons in Next.js
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-	iconRetinaUrl:
-		"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-	iconUrl:
-		"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-	shadowUrl:
-		"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+// Dynamically import react-leaflet components with no SSR
+const MapContainer = dynamic(
+	() => import("react-leaflet").then((mod) => mod.MapContainer),
+	{ ssr: false }
+);
+const TileLayer = dynamic(
+	() => import("react-leaflet").then((mod) => mod.TileLayer),
+	{ ssr: false }
+);
+const Marker = dynamic(
+	() => import("react-leaflet").then((mod) => mod.Marker),
+	{ ssr: false }
+);
+const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
+	ssr: false,
 });
 
 // Custom icon colors based on threat level
@@ -24,41 +29,50 @@ const getThreatColor = (threatLevel) => {
 	return "#22c55e"; // green-600
 };
 
-const createCustomIcon = (color, isSelected) => {
-	const size = isSelected ? 32 : 28;
-	const borderWidth = isSelected ? 4 : 3;
-	return L.divIcon({
-		className: `custom-marker ${isSelected ? "selected" : ""}`,
-		html: `<div style="
-			background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
-			width: ${size}px;
-			height: ${size}px;
-			border-radius: 50% 50% 50% 0;
-			transform: rotate(-45deg);
-			border: ${borderWidth}px solid ${isSelected ? "#ffffff" : "#ffffff"};
-			box-shadow: 0 4px 12px rgba(0,0,0,0.25), 0 0 0 ${
-				isSelected ? "8px" : "0px"
-			} ${color}40;
-			transition: all 0.3s ease;
-			cursor: pointer;
-		"></div>`,
-		iconSize: [size, size],
-		iconAnchor: [size / 2, size],
-	});
-};
-
 // Component to handle map view updates when selected area changes
-function MapViewUpdater({ center, zoom }) {
-	const map = useMap();
-	useEffect(() => {
-		if (center) {
-			map.setView(center, zoom);
-		}
-	}, [map, center, zoom]);
-	return null;
-}
+// This component only renders inside MapContainer (client-side only)
+// We'll create this dynamically inside the component
 
 export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
+	const [leafletLoaded, setLeafletLoaded] = useState(false);
+	const [L, setL] = useState(null);
+	const [MapViewUpdater, setMapViewUpdater] = useState(null);
+
+	// Load leaflet and create MapViewUpdater on client side
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			Promise.all([import("leaflet"), import("react-leaflet")]).then(
+				([leaflet, reactLeaflet]) => {
+					const leafletModule = leaflet.default || leaflet;
+					// Fix for default marker icons in Next.js
+					delete leafletModule.Icon.Default.prototype._getIconUrl;
+					leafletModule.Icon.Default.mergeOptions({
+						iconRetinaUrl:
+							"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+						iconUrl:
+							"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+						shadowUrl:
+							"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+					});
+					setL(leafletModule);
+
+					// Create MapViewUpdater component
+					const Updater = ({ center, zoom }) => {
+						const map = reactLeaflet.useMap();
+						useEffect(() => {
+							if (center) {
+								map.setView(center, zoom);
+							}
+						}, [map, center, zoom]);
+						return null;
+					};
+					setMapViewUpdater(() => Updater);
+					setLeafletLoaded(true);
+				}
+			);
+		}
+	}, []);
+
 	// Calculate map center from all areas
 	const mapCenter = useMemo(() => {
 		if (!areas || areas.length === 0) {
@@ -82,6 +96,31 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 		? [selectedArea.coordinates.lat, selectedArea.coordinates.lng]
 		: mapCenter;
 
+	// Create custom icon function
+	const createCustomIcon = (color, isSelected) => {
+		if (!L) return null;
+		const size = isSelected ? 32 : 28;
+		const borderWidth = isSelected ? 4 : 3;
+		return L.divIcon({
+			className: `custom-marker ${isSelected ? "selected" : ""}`,
+			html: `<div style="
+				background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
+				width: ${size}px;
+				height: ${size}px;
+				border-radius: 50% 50% 50% 0;
+				transform: rotate(-45deg);
+				border: ${borderWidth}px solid ${isSelected ? "#ffffff" : "#ffffff"};
+				box-shadow: 0 4px 12px rgba(0,0,0,0.25), 0 0 0 ${
+					isSelected ? "8px" : "0px"
+				} ${color}40;
+				transition: all 0.3s ease;
+				cursor: pointer;
+			"></div>`,
+			iconSize: [size, size],
+			iconAnchor: [size / 2, size],
+		});
+	};
+
 	if (!areas || areas.length === 0) {
 		return (
 			<div className="flex-1 bg-muted/30 flex items-center justify-center rounded-lg border border-border">
@@ -90,8 +129,8 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 		);
 	}
 
-	// Only render map on client side
-	if (typeof window === "undefined") {
+	// Only render map on client side after leaflet is loaded
+	if (!leafletLoaded || typeof window === "undefined") {
 		return (
 			<div className="flex-1 bg-muted/30 flex items-center justify-center rounded-lg border border-border">
 				<p className="text-muted-foreground">Loading map...</p>
@@ -171,7 +210,7 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 						</Marker>
 					);
 				})}
-				<MapViewUpdater center={centerPoint} zoom={mapZoom} />
+				{MapViewUpdater && <MapViewUpdater center={centerPoint} zoom={mapZoom} />}
 			</MapContainer>
 		</div>
 	);
