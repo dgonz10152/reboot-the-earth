@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BurnAreasSidebar } from "@/components/burn-areas-sidebar";
 import { BurnMap } from "@/components/burn-map";
+import { getData } from "@/lib/get-data";
 
 // Import Mock Data
 const mockBurnAreas = require("./mock-data.json");
@@ -12,6 +13,16 @@ export default function DashboardPage() {
 	const [sortBy, setSortBy] = useState("threat");
 	const [filterThreat, setFilterThreat] = useState(null);
 
+	useEffect(() => {
+		const fetchBurnAreas = async () => {
+			const data = await getData("/dummy");
+			const real_data = data.data.regions;
+
+			console.log(real_data);
+			setBurnAreas(real_data);
+		};
+		fetchBurnAreas();
+	}, []);
 	// Sort and filter burn areas
 	const filteredAndSortedAreas = burnAreas
 		.filter((area) => (filterThreat ? area.threatLevel === filterThreat : true))
