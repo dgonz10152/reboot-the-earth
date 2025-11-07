@@ -15,7 +15,9 @@ export default function DashboardPage() {
 
 	useEffect(() => {
 		const fetchBurnAreas = async () => {
-			const data = await getData("/dummy");
+			const data = await getData("/random");
+
+			console.log(data);
 			const real_data = data.data.regions;
 
 			console.log(real_data);
