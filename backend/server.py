@@ -4,6 +4,8 @@ from joblib import Parallel, delayed
 import os
 import numpy as np
 import pandas as pd
+import random
+from datetime import datetime, timedelta
 from flask_cors import CORS
 # import backend.data_processing as dp  # <-- you’ll create this
 # import backend.io_utils as ioutil      # <-- optional (for file handling)
@@ -164,7 +166,72 @@ def dummy_data():
     return jsonify(dummy_response), 200
 
 # -------------------------------
+# API Endpoint: Random Data
+# -------------------------------
+@app.route("/random", methods=["GET"])
+def random_data():
+    """
+    Return 5 random region entries with the same schema as the dummy data.
+    """
+    # Generate random values
+    region_names = [
+        "North Ridge Valley", "Coastal Pine Forest", "Mountain High Plains",
+        "Desert Canyon", "Forest Edge", "Valley Basin", "Plateau Summit",
+        "River Delta", "Mesa Top", "Canyon Rim"
+    ]
+    regions = ["Northern", "Coastal", "Mountain", "Desert", "Forest", "Valley", "Plateau", "River", "Mesa", "Canyon"]
+    weather_forecasts = [
+        "Hot and dry, high winds expected",
+        "Moderate conditions, light breeze",
+        "Cool and humid, calm winds",
+        "Warm with moderate winds",
+        "Extremely hot, strong winds",
+        "Mild conditions, variable winds",
+        "Dry and windy",
+        "Humid with light winds",
+        "Hot and still",
+        "Cool and breezy"
+    ]
+    
+    # Generate 5 random regions
+    random_regions = []
+    for _ in range(5):
+        # Generate random date within last 2 years
+        days_ago = random.randint(0, 730)
+        last_burn_date = (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
+        
+        random_regions.append({
+            "id": str(random.randint(1, 1000)),
+            "name": random.choice(region_names),
+            "threatLevel": random.randint(1, 5),
+            "lastBurnDate": last_burn_date,
+            "coordinates": {
+                "lat": round(random.uniform(30.0, 40.0), 4),
+                "lng": round(random.uniform(-120.0, -110.0), 4)
+            },
+            "statistics": {
+                "dryness": random.randint(1, 5),
+                "fuelLoad": random.randint(1, 5),
+                "windSpeed": random.randint(1, 5),
+                "vegetationDensity": random.randint(1, 5),
+                "temperature": random.randint(1, 5)
+            },
+            "weatherForecast": random.choice(weather_forecasts),
+            "region": random.choice(regions)
+        })
+    
+    random_response = {
+        "status": "success",
+        "message": "This is random data",
+        "data": {
+            "regions": random_regions
+        }
+    }
+    
+    return jsonify(random_response), 200
+
+# -------------------------------
 # Run the Server
 # -------------------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5003)
+    app.run(host="0.0.0.0", port=5003, debug=True)
