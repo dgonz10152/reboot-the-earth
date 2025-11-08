@@ -4,8 +4,7 @@ from joblib import Parallel, delayed
 import os
 import numpy as np
 import pandas as pd
-import random
-from datetime import datetime, timedelta
+import json
 from flask_cors import CORS
 import requests
 from dotenv import load_dotenv
@@ -191,29 +190,30 @@ JSON_SCHEMA = {
 }
 
 # -------------------------------
-# Helper: Run Model Inference
+# Helper: Load Precomputed Data
 # -------------------------------
 
-def calculate_threat_rating(preliminary_feasability_score, threat_rating, total_population, total_value_estimate):
+def load_precomputed_data():
     """
-    Calculate the threat rating based on the preliminary feasability score, threat rating, total population, and total value estimate.
+    Load the precomputed data from JSON file.
     """
-
-    if total_population == 0 and total_value_estimate == 0:
-        return ((threat_rating * 0.9) + ((preliminary_feasability_score + 0.3) * 0.1))
-        
-
-    return (threat_rating * 0.7) + ((preliminary_feasability_score + 0.3) * 0.1) + ((total_population / 52_000 + total_value_estimate / 16_650_000_000) / 6 ) * 0.2
-
-def get_weather_data(lat, lng):
-    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&daily=temperature_2m_mean,soil_moisture_0_to_7cm_mean,weathercode,windspeed_10m_mean&timezone=America/Los_Angeles&temperature_unit=fahrenheit"
     try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()  # Raises an exception for bad status codes
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching weather data: {e}")
-        return None
+        with open("precomputed_data.json", 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print("Warning: precomputed_data.json not found. Run pre_compute.py first.")
+        return {
+            "status": "error",
+            "data": [],
+            "message": "Precomputed data not found. Please run pre_compute.py first."
+        }
+    except json.JSONDecodeError as e:
+        print(f"Error parsing precomputed_data.json: {e}")
+        return {
+            "status": "error",
+            "data": [],
+            "message": "Error parsing precomputed data file."
+        }
 
 def get_town(lat, lng):
     key = os.getenv("KEY")
@@ -472,28 +472,18 @@ def generate_v1_dummy_data():
 @app.route("/v1", methods=["GET"])
 def v1():
     """
-    Return the v1 endpoint with dummy data matching the specified schema.
+    Return the v1 endpoint with precomputed data.
     """
-    burn_areas = generate_v1_dummy_data()
-    
-    v1_response = {
-        "status": "success",
-        "data": burn_areas
-    }
+    v1_response = load_precomputed_data()
     return jsonify(v1_response), 200
 
 @app.route("/v0", methods=["GET"])
 def v0():
     """
-    Return the v1 endpoint with dummy data matching the specified schema.
+    Return the v0 endpoint with precomputed data.
     """
-    burn_areas = generate_v0_dummy_data()
-    
-    v1_response = {
-        "status": "success",
-        "data": burn_areas
-    }
-    return jsonify(v1_response), 200
+    v0_response = load_precomputed_data()
+    return jsonify(v0_response), 200
 
 @app.route("/city-metrics", methods=["POST"])
 def city_metrics():
