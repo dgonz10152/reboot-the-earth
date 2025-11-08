@@ -19,7 +19,7 @@ from openai import OpenAI
 # Load environment variables from .env file
 load_dotenv()
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("OPEN_AI"))
 VECTOR_STORE_ID = "vs_690e81d520088191958d81df531fa352"
 
 # -------------------------------
