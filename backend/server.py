@@ -148,7 +148,7 @@ def calculate_threat_rating(preliminary_feasability_score, threat_rating, total_
         return ((threat_rating * 0.9) + ((preliminary_feasability_score + 0.3) * 0.1))
         
 
-    return (threat_rating * 0.7) + ((preliminary_feasability_score + 0.3) * 0.1) + ((total_population / 52_000 + total_value_estimate / 16_650_000_000) / 6 ) * 0.2
+    return (threat_rating) * math.sqrt(total_value_estimate) * math.log(1+total_population, 10) * (preliminary_feasability_score)
 
 def get_weather_data(lat, lng):
     url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&daily=temperature_2m_mean,soil_moisture_0_to_7cm_mean,weathercode,windspeed_10m_mean&timezone=America/Los_Angeles&temperature_unit=fahrenheit"
