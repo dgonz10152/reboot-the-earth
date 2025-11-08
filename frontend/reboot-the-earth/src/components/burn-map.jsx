@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 
-// Dynamically import react-leaflet components with no SSR
 const MapContainer = dynamic(
 	() => import("react-leaflet").then((mod) => mod.MapContainer),
 	{ ssr: false }
@@ -20,33 +19,37 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
 	ssr: false,
 });
 
-// Custom icon colors based on threat level
+/**
+ * Returns a color code based on the threat level.
+ * @param {number} threatLevel - Threat level (0-10 scale, or 0-1 which will be normalized)
+ * @returns {string} Hex color code for the threat level
+ */
 const getThreatColor = (threatLevel) => {
-	// Normalize threat level to 0-10 scale if it's in 0-1 range
 	const normalizedLevel = threatLevel < 1 ? threatLevel * 10 : threatLevel;
-	if (normalizedLevel >= 8) return "#dc2626"; // red-600
-	if (normalizedLevel >= 6) return "#ea580c"; // orange-600
-	if (normalizedLevel >= 4) return "#f59e0b"; // amber-600
-	if (normalizedLevel >= 2) return "#84cc16"; // lime-600
-	return "#22c55e"; // green-600
+	if (normalizedLevel >= 8) return "#dc2626";
+	if (normalizedLevel >= 6) return "#ea580c";
+	if (normalizedLevel >= 4) return "#f59e0b";
+	if (normalizedLevel >= 2) return "#84cc16";
+	return "#22c55e";
 };
 
-// Component to handle map view updates when selected area changes
-// This component only renders inside MapContainer (client-side only)
-// We'll create this dynamically inside the component
-
+/**
+ * Map component displaying burn areas with threat level markers.
+ * @param {Object} props - Component props
+ * @param {Array} props.areas - Array of burn area objects
+ * @param {string} props.selectedAreaId - ID of the currently selected area
+ * @param {Function} props.onSelectArea - Callback function when an area is selected
+ */
 export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 	const [leafletLoaded, setLeafletLoaded] = useState(false);
 	const [L, setL] = useState(null);
 	const [MapViewUpdater, setMapViewUpdater] = useState(null);
 
-	// Load leaflet and create MapViewUpdater on client side
 	useEffect(() => {
 		if (typeof window !== "undefined") {
 			Promise.all([import("leaflet"), import("react-leaflet")]).then(
 				([leaflet, reactLeaflet]) => {
 					const leafletModule = leaflet.default || leaflet;
-					// Fix for default marker icons in Next.js
 					delete leafletModule.Icon.Default.prototype._getIconUrl;
 					leafletModule.Icon.Default.mergeOptions({
 						iconRetinaUrl:
@@ -58,11 +61,10 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 					});
 					setL(leafletModule);
 
-					// Create MapViewUpdater component
 					const Updater = ({ center, zoom }) => {
 						const map = reactLeaflet.useMap();
 						useEffect(() => {
-							if (center && map && map.setView) {
+							if (center && map?.setView) {
 								try {
 									map.setView(center, zoom);
 								} catch (error) {
@@ -79,10 +81,9 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 		}
 	}, []);
 
-	// Calculate map center from all areas
 	const mapCenter = useMemo(() => {
-		if (!areas || areas.length === 0) {
-			return [34.0522, -118.2437]; // Default to LA area
+		if (!areas?.length) {
+			return [34.0522, -118.2437];
 		}
 		const avgLat =
 			areas.reduce((sum, area) => sum + area.coordinates.lat, 0) / areas.length;
@@ -91,20 +92,23 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 		return [avgLat, avgLng];
 	}, [areas]);
 
-	// Get selected area coordinates for centering
 	const selectedArea = useMemo(() => {
 		return areas?.find((area) => area.id === selectedAreaId);
 	}, [areas, selectedAreaId]);
 
-	// Determine zoom level and center
 	const mapZoom = selectedArea ? 12 : 10;
 	const centerPoint = selectedArea
 		? [selectedArea.coordinates.lat, selectedArea.coordinates.lng]
 		: mapCenter;
 
-	// Create custom icon function
+	/**
+	 * Creates a custom Leaflet icon for markers.
+	 * @param {string} color - Hex color code for the marker
+	 * @param {boolean} isSelected - Whether the marker is currently selected
+	 * @returns {Object|null} Leaflet icon object or null if creation fails
+	 */
 	const createCustomIcon = (color, isSelected) => {
-		if (!L || !L.divIcon) return null;
+		if (!L?.divIcon) return null;
 		try {
 			const size = isSelected ? 32 : 28;
 			const borderWidth = isSelected ? 4 : 3;
@@ -116,7 +120,7 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 					height: ${size}px;
 					border-radius: 50% 50% 50% 0;
 					transform: rotate(-45deg);
-					border: ${borderWidth}px solid ${isSelected ? "#ffffff" : "#ffffff"};
+					border: ${borderWidth}px solid #ffffff;
 					box-shadow: 0 4px 12px rgba(0,0,0,0.25), 0 0 0 ${
 						isSelected ? "8px" : "0px"
 					} ${color}40;
@@ -132,7 +136,7 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 		}
 	};
 
-	if (!areas || areas.length === 0) {
+	if (!areas?.length) {
 		return (
 			<div className="flex-1 bg-muted/30 flex items-center justify-center rounded-lg border border-border">
 				<p className="text-muted-foreground">No burn areas to display</p>
@@ -140,7 +144,6 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 		);
 	}
 
-	// Only render map on client side after leaflet is loaded
 	if (!leafletLoaded || typeof window === "undefined") {
 		return (
 			<div className="flex-1 bg-muted/30 flex items-center justify-center rounded-lg border border-border">
@@ -158,9 +161,6 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 				style={{ height: "100%", width: "100%", zIndex: 0 }}
 				scrollWheelZoom={true}
 				zoomControl={true}
-				whenReady={() => {
-					// Map is ready, ensure proper initialization
-				}}
 			>
 				<TileLayer
 					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
@@ -170,11 +170,11 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 				{areas.map((area) => {
 					const isSelected = area.id === selectedAreaId;
 					const threatRating = area["calculated-threat-rating"];
-					const normalizedRating = threatRating < 1 ? threatRating * 10 : threatRating;
+					const normalizedRating =
+						threatRating < 1 ? threatRating * 10 : threatRating;
 					const color = getThreatColor(normalizedRating);
 					const icon = createCustomIcon(color, isSelected);
 
-					// Skip rendering marker if icon creation failed
 					if (!icon) return null;
 
 					return (
@@ -183,9 +183,7 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 							position={[area.coordinates.lat, area.coordinates.lng]}
 							icon={icon}
 							eventHandlers={{
-								click: () => {
-									onSelectArea(area.id);
-								},
+								click: () => onSelectArea(area.id),
 							}}
 						>
 							<Popup
@@ -206,20 +204,21 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 											<span
 												className="text-xs font-semibold px-2 py-0.5 rounded-full"
 												style={{
-													backgroundColor: `${getThreatColor(normalizedRating)}20`,
-													color: getThreatColor(normalizedRating),
+													backgroundColor: `${color}20`,
+													color: color,
 												}}
 											>
 												{normalizedRating.toFixed(2)}/10
 											</span>
 										</div>
 										<p className="text-xs text-muted-foreground">
-											<span className="font-medium">Feasibility:</span> {(() => {
+											<span className="font-medium">Feasibility:</span>{" "}
+											{(() => {
 												const score = area["preliminary-feasability-score"];
-												// Normalize from 0-1 to 1-10 scale: (value * 9) + 1
-												const normalized = score < 1 ? (score * 9) + 1 : score;
+												const normalized = score < 1 ? score * 9 + 1 : score;
 												return normalized.toFixed(2);
-											})()}/10
+											})()}
+											/10
 										</p>
 										<p className="text-xs text-muted-foreground">
 											<span className="font-medium">Last Burn:</span>{" "}
@@ -229,9 +228,10 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 												day: "numeric",
 											})}
 										</p>
-										{area["nearby-towns"] && area["nearby-towns"].length > 0 && (
+										{area["nearby-towns"]?.length > 0 && (
 											<p className="text-xs text-muted-foreground">
-												<span className="font-medium">Nearby:</span> {area["nearby-towns"].map(t => t.name).join(", ")}
+												<span className="font-medium">Nearby:</span>{" "}
+												{area["nearby-towns"].map((t) => t.name).join(", ")}
 											</p>
 										)}
 									</div>
