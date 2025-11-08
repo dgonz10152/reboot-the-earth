@@ -5,10 +5,9 @@ import { BurnMap } from "@/components/burn-map";
 import { getData } from "@/lib/get-data";
 
 // Import Mock Data
-import mockBurnAreas from "./mock-data.json";
 
 export default function DashboardPage() {
-	const [burnAreas, setBurnAreas] = useState(mockBurnAreas || []);
+	const [burnAreas, setBurnAreas] = useState([]);
 	const [selectedAreaId, setSelectedAreaId] = useState(null);
 	const [sortBy, setSortBy] = useState("threat");
 	const [filterThreat, setFilterThreat] = useState(null);
@@ -32,7 +31,10 @@ export default function DashboardPage() {
 					console.warn("API returned invalid data structure, using mock data");
 				}
 			} catch (error) {
-				console.error("Failed to fetch burn areas from API, using mock data:", error);
+				console.error(
+					"Failed to fetch burn areas from API, using mock data:",
+					error
+				);
 				// Keep using mock data that's already in state
 			}
 		};
@@ -62,16 +64,20 @@ export default function DashboardPage() {
 				return bNormalized - aNormalized;
 			} else if (sortBy === "date") {
 				return (
-					new Date(b["last-burn-date"]).getTime() - new Date(a["last-burn-date"]).getTime()
+					new Date(b["last-burn-date"]).getTime() -
+					new Date(a["last-burn-date"]).getTime()
 				);
 			} else {
 				return a.name.localeCompare(b.name);
 			}
 		});
 
-	const selectedArea = selectedAreaId && burnAreas
-		? burnAreas.find((area) => area.id === selectedAreaId)
-		: null;
+	const selectedArea =
+		selectedAreaId && burnAreas
+			? burnAreas.find((area) => area.id === selectedAreaId)
+			: null;
+
+	console.log("BUUURN", burnAreas);
 
 	return (
 		<div className="flex h-screen bg-background">

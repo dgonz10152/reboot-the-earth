@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 from flask_cors import CORS
 import requests
 from dotenv import load_dotenv
+from neighbors import location_to_neighbor_values
+
 # import backend.data_processing as dp  # <-- you'll create this
 # import backend.io_utils as ioutil      # <-- optional (for file handling)
 
@@ -78,7 +80,7 @@ def get_towns_within_radius(lat, lon, radius_km, username="dgonz209"):
     params = {
         "lat": lat,
         "lng": lon,
-        "radius": radius_km,
+        "radius": 20, # search witin a 20km radius
         "maxRows": 20,
         "username": username,
     }
@@ -202,7 +204,6 @@ def generate_v0_dummy_data():
 
         if town:
             town_name = town.get("display_name")
-            print(town.get("boundingbox"))
 
         burn_area = {
             "coordinates": {
@@ -240,16 +241,36 @@ def generate_v1_dummy_data():
     threat_rating = random.uniform(0.0, 1.0)
 
 
-
+    california_coords = [
+    (32.534156, -117.127221),  # San Diego
+    (33.953349, -117.396156),  # Riverside
+    (34.052235, -118.243683),  # Los Angeles
+    (36.778259, -119.417931),  # Central California
+    (37.774929, -122.419418),  # San Francisco
+    (38.581572, -121.494400),  # Sacramento
+    (39.728494, -121.837478),  # Chico
+    (40.586540, -122.391675),  # Redding
+    (41.745870, -122.634075),  # Mount Shasta
+    (34.420830, -119.698189),  # Santa Barbara
+    (36.974117, -122.030792),  # Santa Cruz
+    (32.715736, -117.161087),  # Another point in San Diego
+    (38.440429, -122.714054),  # Santa Rosa
+    (34.108345, -117.289765),  # San Bernardino
+    (36.737797, -119.787125),  # Fresno
+]
  
     
     # Generate random burn area data
     burn_areas = []
     for i in range(1):  # Generate 10 random burn areas
         # Generate random coordinates (California area)
-        lat = round(random.uniform(32.0, 42.0), 6)
-        lng = round(random.uniform(-125.0, -114.0), 6)
+        # lat = round(random.uniform(32.0, 42.0), 6)
+        # lng = round(random.uniform(-125.0, -114.0), 6)
+
+        lat, lng = random.choice(california_coords)
         
+
+        #TODO: CHANGE AREA AND BURN DAYS
         # Generate random ID
         area_id = random.randint(1000, 9999)
         
@@ -257,7 +278,7 @@ def generate_v1_dummy_data():
         days_ago = random.randint(0, 1825)  # 5 years
         last_burn_date = (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
         
-        
+        #TODO: REPLACE WITH GPT QUERIES
         # Generate statistics (all float values from 0-1)
         statistics = {
             "safety": round(random.uniform(0.0, 1.0), 3),
@@ -276,28 +297,16 @@ def generate_v1_dummy_data():
         # Calculate preliminary feasibility score (average of all statistics)
         stat_values = list(statistics.values())
         # Clamp the score to ensure it's between 0 and 1
-        preliminary_feasability_score = (round(sum(stat_values) / len(stat_values), 3))
+        preliminary_feasability_score = 1 - (round(sum(stat_values) / len(stat_values), 3))
                 
         # Generate threat ratings (random predictions from malco model)
         threat_rating = round(random.uniform(0.0, 1.0), 3)
         
         # Generate nearby towns (1-4 towns)
         num_towns = random.randint(1, 4)
-        nearby_towns = []
-        used_town_names = set()
-        
-        for _ in range(num_towns):
-            # Ensure unique town names
-            town_name = random.choice(nearby_town_names)
-            while town_name in used_town_names:
-                town_name = random.choice(nearby_town_names)
-            used_town_names.add(town_name)
-            
-            nearby_towns.append({
-                "name": town_name,
-                "population": random.randint(500, 50000),
-                "value-estimate": round(random.uniform(1000000, 50000000), 2)  # GDP estimate in dollars
-            })
+        nearby_towns = location_to_neighbor_values(lat, lng)
+
+        print("NEARBY:", nearby_towns)
         
         total_population = sum(town["population"] for town in nearby_towns)
         total_value_estimate = sum(town["value-estimate"] for town in nearby_towns)
@@ -311,7 +320,6 @@ def generate_v1_dummy_data():
 
         if town:
             town_name = town.get("display_name")
-            print(town.get("boundingbox"))
 
         burn_area = {
             "coordinates": {
@@ -342,7 +350,6 @@ def v1():
     
     v1_response = {
         "status": "success",
-        "message": "This is the v1 endpoint",
         "data": burn_areas
     }
     return jsonify(v1_response), 200
