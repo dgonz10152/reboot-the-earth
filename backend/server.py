@@ -11,7 +11,10 @@ import requests
 from dotenv import load_dotenv
 from neighbors import location_to_neighbor_values
 import math
+import json
+import time
 from openai import OpenAI
+import traceback
 
 # import backend.data_processing as dp  # <-- you'll create this
 # import backend.io_utils as ioutil      # <-- optional (for file handling)
@@ -43,8 +46,60 @@ app = Flask(__name__)
 CORS(app)
 
 # -------------------------------
-# OpenAI Prompt
+# OpenAI Prompts
 # -------------------------------
+
+WEB_RESEARCH_AGENT_PROMPT = """
+You are a Web Research Agent specializing in gathering real-world environmental, geographic,
+cultural, and logistical information for prescribed fire planning.
+Your job is to use online sources—including government data portals, land-management agencies,
+scientific literature, maps, satellite tools, and regional planning documents—to collect accurate,
+verifiable information about a given project location.
+
+GOAL
+When provided a location (coordinates, address, region name, or project boundary),
+research the location and produce factual, sourced answers to each of the assessment questions.
+
+RESEARCH REQUIREMENTS
+- Use authoritative sources whenever possible.
+- Prioritize the most recent available data.
+- Summarize findings concisely but with sufficient detail for risk analysis.
+- Include citations with URLs for each answer.
+- If data cannot be found, state what is missing and which sources were searched.
+- Do not invent information.
+
+OUTPUT FORMAT
+Return a JSON object with the following fields:
+
+{
+  "resources_inside_boundary": "",
+  "sensitive_adjacent_resources": "",
+  "public_interest_level": "",
+  "environmental_hazards": "",
+  "nearest_ems_facilities": "",
+  "fuel_models_and_variability": "",
+  "terrain_and_wind_effects": "",
+  "probability_of_external_ignitions": "",
+  "containment_dependencies": "",
+  "suppression_constraints_if_slopover": "",
+  "accessibility_and_remoteness": "",
+  "sources": []
+}
+
+RESEARCH TASKS
+For the given location, find and summarize:
+1. Natural, cultural, or human resources inside the project boundary
+2. Significant developments or sensitive resources just outside the boundary
+3. Degree of public/political sensitivity or concern
+4. Environmental hazards onsite or along travel routes
+5. Nearest EMS facilities and transport times
+6. Dominant fuel models and variability
+7. Wind/microclimate impacts from terrain
+8. Ignition probability outside the unit (spotting or slopover)
+9. Dependence on natural fuel breaks and heavy-fuel concerns
+10. Suppression restrictions if the fire escapes into nearby areas
+11. Accessibility, remoteness, travel/vehicle limitations
+"""
 
 STATISTICS_PROMPT = """
 You are a scoring agent for prescribed fire risk. Use the reference PDF (retrieved via vector store ID: vs_690e81d520088191958d81df531fa352) to classify user-provided information into risk tiers and convert them to normalized numeric scores.
@@ -173,63 +228,117 @@ def get_town(lat, lng):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching location data: {e}")
         return None
-    
-def score():
-    """
-    Body (JSON):
-    {
-      "input": "...free text OR structured fields...",
-      "context": "...optional extra notes...",
-      "hints": "...optional numeric thresholds or labels provided by user..."
-    }
-    """
-    data = request.get_json(force=True, silent=True) or {}
-    user_payload = {
-        "input": data.get("input", ""),
-        "context": data.get("context", ""),
-        "hints": data.get("hints", "")
-    }
 
+
+def research_and_score_location(location, context="", hints=""):
+    """
+    Combined function that researches a location and then scores it using the statistics schema.
+    
+    Args:
+        location: String describing the place to research
+        context: Optional extra context for scoring
+        hints: Optional numeric thresholds or labels
+    
+    Returns:
+        Dictionary with statistics matching JSON_SCHEMA format, or None on error
+    """
+    print(f"[research_and_score_location] Called with location: {location}")
+    if not location or not location.strip():
+        print("[research_and_score_location] Location is empty, returning None")
+        return None
+    
     try:
-        resp = client.responses.create(
-            model="o4-mini-2025-04-16",
+        # Step 1: Research the location using the web research agent
+        print(f"[research_and_score_location] Making research API call for location: {location}")
+        research_response = client.chat.completions.create(
+            model="gpt-4o-mini-search-preview",   # or whichever model you are using
             messages=[
-                {"role": "system", "content": STATISTICS_PROMPT},
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": (
-                                "Score the following inputs strictly per the schema. "
-                                "If any category is missing, infer conservatively.\n\n"
-                                f"{user_payload}"
-                            ),
-                        }
-                    ],
-                },
-            ],
-            tools=[{
-                "type": "file_search",
-                "vector_store_ids": [VECTOR_STORE_ID]
-            }],
-            # Enforce strict JSON output via schema
-            response_format={"type": "json_schema", "json_schema": JSON_SCHEMA},
-            # (Optional) Temperature low for deterministic scoring
+                {"role": "system", "content": WEB_RESEARCH_AGENT_PROMPT},
+                {"role": "user", "content": f"Research the following location: {location}"}
+            ]
+        )
+        
+        # Extract research output
+        research_data = research_response.choices[0].message.content
+        print(f"[research_and_score_location] Research data output: {research_data}")
+        
+        # Step 2: Use research data as input to the scoring agent via Assistants API
+        # Combine research data with any additional context/hints
+        scoring_input = {
+            "input": research_data,
+            "context": context,
+            "hints": hints
+        }
+        
+        print(f"[research_and_score_location] Creating assistant for scoring with vector store")
+        
+        # Create an assistant with file_search tool and vector store
+        assistant = client.beta.assistants.create(
+            name="Fire Risk Scoring Assistant",
+            instructions=STATISTICS_PROMPT,
+            model="gpt-4o-mini",
+            tools=[{"type": "file_search"}],
+            tool_resources={
+                "file_search": {
+                    "vector_store_ids": [VECTOR_STORE_ID]
+                }
+            },
             temperature=0.1,
         )
-
-        # With response_format=json_schema, the top-level output is valid JSON text
-        content = resp.output_text  # SDK exposes parsed text; no extra parsing needed
-        return app.response_class(
-            response=content,
-            status=200,
-            mimetype="application/json"
+        
+        # Create a thread
+        thread = client.beta.threads.create()
+        
+        # Add the user message
+        user_message = (
+            "Score the following inputs strictly per the schema. "
+            "If any category is missing, infer conservatively.\n\n"
+            f"{json.dumps(scoring_input, indent=2)}\n\n"
+            "IMPORTANT: You must return ONLY valid JSON matching this exact schema:\n"
+            f"{json.dumps(JSON_SCHEMA['schema'], indent=2)}"
         )
-
+        
+        client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=user_message
+        )
+        
+        # Run the assistant
+        print(f"[research_and_score_location] Running assistant thread")
+        run = client.beta.threads.runs.create(
+            thread_id=thread.id,
+            assistant_id=assistant.id
+        )
+        
+        # Poll for completion
+        while run.status in ["queued", "in_progress"]:
+            time.sleep(0.5)
+            run = client.beta.threads.runs.retrieve(
+                thread_id=thread.id,
+                run_id=run.id
+            )
+        
+        if run.status != "completed":
+            raise Exception(f"Assistant run failed with status: {run.status}")
+        
+        # Retrieve the response
+        messages = client.beta.threads.messages.list(thread_id=thread.id)
+        score_json = messages.data[0].content[0].text.value
+        
+        print(f"[research_and_score_location] Assistant response: {score_json}")
+        
+        # Parse the JSON string to get the statistics dict
+        result = json.loads(score_json)
+        
+        # Return just the statistics object (matching the format used in v1 endpoint)
+        return result.get("statistics", {})
+        
     except Exception as e:
-        # Do not leak model output; return a clean error shape
-        return jsonify({"error": str(e)}), 500
+        print(f"[research_and_score_location] Error occurred: {e}")
+        print(f"[research_and_score_location] Traceback: {traceback.format_exc()}")
+        return None
+
 
 def generate_v1_dummy_data():
     """
@@ -267,12 +376,12 @@ def generate_v1_dummy_data():
     
     # Generate random burn area data
     burn_areas = []
-    for i in range(4):  # Generate 10 random burn areas
+    for i in range(1):  # Generate 10 random burn areas
         # Generate random coordinates (California area)
         # lat = round(random.uniform(32.0, 42.0), 6)
         # lng = round(random.uniform(-125.0, -114.0), 6)
 
-        lat, lng = random.choice(california_coords)
+        lat, lng = 39.997488, -122.705376
         
 
         #TODO: CHANGE AREA AND BURN DAYS
@@ -283,21 +392,52 @@ def generate_v1_dummy_data():
         days_ago = random.randint(0, 1825)  # 5 years
         last_burn_date = (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
         
-        #TODO: REPLACE WITH GPT QUERIES
-        # Generate statistics (all float values from 0-1)
-        statistics = {
-            "safety": round(random.uniform(0.0, 1.0), 3),
-            "fire-behavior": round(random.uniform(0.0, 1.0), 3),
-            "resistance-to-containment": round(random.uniform(0.0, 1.0), 3),
-            "ignition-procedures-and-methods": round(random.uniform(0.0, 1.0), 3),
-            "prescribed-fire-duration": round(random.uniform(0.0, 1.0), 3),
-            "smoke-management": round(random.uniform(0.0, 1.0), 3),
-            "number-and-dependence-of-activities": round(random.uniform(0.0, 1.0), 3),
-            "management-organizations": round(random.uniform(0.0, 1.0), 3),
-            "treatment-resource-objectives": round(random.uniform(0.0, 1.0), 3),
-            "constraints": round(random.uniform(0.0, 1.0), 3),
-            "project-logistics": round(random.uniform(0.0, 1.0), 3)
-        }
+        # Get town name first to use for location research
+        town = get_town(lat, lng)
+        town_name = "N/A"
+        if town:
+            town_name = town.get("display_name")
+        
+        # Generate nearby towns (1-4 towns)
+        num_towns = random.randint(1, 4)
+        print(f"[generate_v1_dummy_data] Fetching nearby towns for location: {lat}, {lng}")
+        nearby_towns = location_to_neighbor_values(lat, lng)
+        
+        if not nearby_towns:
+            print(f"[generate_v1_dummy_data] No nearby towns found, using empty list")
+            nearby_towns = []
+        
+        total_population = sum(town.get("population", 0) for town in nearby_towns)
+        total_value_estimate = sum(town.get("value-estimate", 0) for town in nearby_towns)
+        
+        # Use combined research and scoring function
+        # Create location string from town name or coordinates
+        location_string = town_name if town_name != "N/A" else f"{lat}, {lng}"
+        
+        # Call the combined research and scoring function
+        print(f"[generate_v1_dummy_data] Calling research_and_score_location for: {location_string}")
+        statistics = research_and_score_location(location_string)
+        
+        # Fallback to random statistics if research/scoring fails
+        if not statistics:
+            print(f"[generate_v1_dummy_data] Research/scoring failed, using fallback random statistics")
+            statistics = {
+                "safety": round(random.uniform(0.0, 1.0), 3),
+                "fire-behavior": round(random.uniform(0.0, 1.0), 3),
+                "resistance-to-containment": round(random.uniform(0.0, 1.0), 3),
+                "ignition-procedures-and-methods": round(random.uniform(0.0, 1.0), 3),
+                "prescribed-fire-duration": round(random.uniform(0.0, 1.0), 3),
+                "smoke-management": round(random.uniform(0.0, 1.0), 3),
+                "number-and-dependence-of-activities": round(random.uniform(0.0, 1.0), 3),
+                "management-organizations": round(random.uniform(0.0, 1.0), 3),
+                "treatment-resource-objectives": round(random.uniform(0.0, 1.0), 3),
+                "constraints": round(random.uniform(0.0, 1.0), 3),
+                "project-logistics": round(random.uniform(0.0, 1.0), 3)
+            }
+        else:
+            print(f"[generate_v1_dummy_data] Successfully received statistics from research_and_score_location")
+            # Ensure all values are rounded to 3 decimal places
+            statistics = {k: round(float(v), 3) for k, v in statistics.items()}
         
         # Calculate preliminary feasibility score (average of all statistics)
         stat_values = list(statistics.values())
@@ -306,23 +446,6 @@ def generate_v1_dummy_data():
                 
         # Generate threat ratings (random predictions from malco model)
         threat_rating = round(random.uniform(0.0, 1.0), 3)
-        
-        # Generate nearby towns (1-4 towns)
-        num_towns = random.randint(1, 4)
-        nearby_towns = location_to_neighbor_values(lat, lng)
-        
-        total_population = sum(town["population"] for town in nearby_towns)
-        total_value_estimate = sum(town["value-estimate"] for town in nearby_towns)
-
-        # get_weather_data(lat, lng)
-
-        town = get_town(lat, lng)
-
-
-        town_name = "N/A"
-
-        if town:
-            town_name = town.get("display_name")
 
         burn_area = {
             "coordinates": {
