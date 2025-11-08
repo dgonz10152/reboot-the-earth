@@ -4,8 +4,22 @@ import { BurnAreasSidebar } from "@/components/burn-areas-sidebar";
 import { BurnMap } from "@/components/burn-map";
 import { getData } from "@/lib/get-data";
 
-// Import Mock Data
+/**
+ * Normalizes threat rating to a 0-10 scale for consistent comparison.
+ * @param {number} rating - The threat rating value
+ * @returns {number} Normalized rating on 0-10 scale
+ */
+const normalizeThreatRating = (rating) => {
+	return rating < 1 ? rating * 10 : rating;
+};
 
+/**
+ * Main dashboard page component for displaying and managing burn areas.
+ * Fetches burn area data, provides filtering and sorting capabilities,
+ * and renders both a sidebar list and interactive map view.
+ *
+ * @returns {JSX.Element} Dashboard layout with sidebar and map components
+ */
 export default function DashboardPage() {
 	const [burnAreas, setBurnAreas] = useState([]);
 	const [selectedAreaId, setSelectedAreaId] = useState(null);
@@ -15,39 +29,25 @@ export default function DashboardPage() {
 	useEffect(() => {
 		const fetchBurnAreas = async () => {
 			try {
-				// Add timestamp to bust cache
-				const timestamp = Date.now();
-				const data = await getData(`/v1?t=${timestamp}`);
+				const data = await getData(`/v1?t=${Date.now()}`);
+				const areas = data?.data || data?.regions || data;
 
-				console.log("API Response:", data);
-				// Backend returns: { status: "success", data: [...] }
-				const real_data = data?.data || data?.regions || data;
-
-				console.log("Extracted data:", real_data);
-				// Ensure we have an array before setting state
-				if (Array.isArray(real_data) && real_data.length > 0) {
-					setBurnAreas(real_data);
-				} else {
-					console.warn("API returned invalid data structure, using mock data");
+				if (Array.isArray(areas) && areas.length > 0) {
+					setBurnAreas(areas);
 				}
 			} catch (error) {
-				console.error(
-					"Failed to fetch burn areas from API, using mock data:",
-					error
-				);
-				// Keep using mock data that's already in state
+				console.error("Failed to fetch burn areas:", error);
 			}
 		};
 		fetchBurnAreas();
 	}, []);
-	// Sort and filter burn areas
+
 	const filteredAndSortedAreas = (burnAreas || [])
 		.filter((area) => {
 			if (!filterThreat) return true;
-			// Normalize threat rating to 0-10 scale for comparison
-			const rating = area["calculated-threat-rating"];
-			const normalized = rating < 1 ? rating * 10 : rating;
-			// Filter by threshold ranges
+
+			const normalized = normalizeThreatRating(area["calculated-threat-rating"]);
+
 			if (filterThreat === 10) return normalized >= 9.5;
 			if (filterThreat === 8) return normalized >= 8 && normalized < 9.5;
 			if (filterThreat === 6) return normalized >= 6 && normalized < 8;
@@ -57,27 +57,20 @@ export default function DashboardPage() {
 		})
 		.sort((a, b) => {
 			if (sortBy === "threat") {
-				const aRating = a["calculated-threat-rating"];
-				const bRating = b["calculated-threat-rating"];
-				const aNormalized = aRating < 1 ? aRating * 10 : aRating;
-				const bNormalized = bRating < 1 ? bRating * 10 : bRating;
+				const aNormalized = normalizeThreatRating(a["calculated-threat-rating"]);
+				const bNormalized = normalizeThreatRating(b["calculated-threat-rating"]);
 				return bNormalized - aNormalized;
-			} else if (sortBy === "date") {
+			}
+
+			if (sortBy === "date") {
 				return (
 					new Date(b["last-burn-date"]).getTime() -
 					new Date(a["last-burn-date"]).getTime()
 				);
-			} else {
-				return a.name.localeCompare(b.name);
 			}
+
+			return a.name.localeCompare(b.name);
 		});
-
-	const selectedArea =
-		selectedAreaId && burnAreas
-			? burnAreas.find((area) => area.id === selectedAreaId)
-			: null;
-
-	console.log("BUUURN", burnAreas);
 
 	return (
 		<div className="flex h-screen bg-background">

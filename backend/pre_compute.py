@@ -1,7 +1,7 @@
 import os
-import random
 import math
 import json
+import random
 import requests
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
@@ -9,12 +9,9 @@ from neighbors import location_to_neighbor_values
 from openai import OpenAI
 
 
-# Load environment variables from .env file
 load_dotenv()
-VECTOR_STORE_ID = "vs_690e81d520088191958d81df531fa352"
 client = OpenAI(api_key=os.getenv("OPEN_AI"))
 
-# open ai prompt
 STATISTICS_PROMPT = """
 You are a scoring agent for prescribed fire risk. Use the reference PDF (retrieved via vector store ID: vs_690e81d520088191958d81df531fa352) to classify user-provided information into risk tiers and convert them to normalized numeric scores.
 
@@ -107,37 +104,26 @@ JSON_SCHEMA = {
 
 def calculate_fire_statistics(input_data):
     """
-    Calculate prescribed fire risk statistics based on input data.
-    Performs web searches for brush, topography, and environmental data internally.
-    
+    Calculate prescribed fire risk statistics based on input data using AI model.
+
     Args:
-        input_data (dict): Any location data (coordinates, weather, nearby towns, etc.)
-        
+        input_data (dict): Location data containing coordinates, weather, nearby towns, etc.
+
     Returns:
-        dict: Statistics object with 11 risk scores (0.00-1.00 each)
-        
-    Example:
-        >>> data = {
-        ...     "coordinates": {"lat": 40.58654, "lng": -122.391675},
-        ...     "name": "Market Street, Redding, CA",
-        ...     "weather": {...},
-        ...     "nearby-towns": [...]
-        ... }
-        >>> stats = calculate_fire_statistics(data)
-        >>> print(stats)
-        {
-            "statistics": {
-                "safety": 0.72,
-                "fire-behavior": 0.26,
-                ...
+        dict: Statistics object with 11 risk scores (0.00-1.00 each) in the format:
+            {
+                "statistics": {
+                    "safety": float,
+                    "fire-behavior": float,
+                    ...
+                }
             }
-        }
+
+    Raises:
+        Exception: If the AI model call fails or response cannot be parsed.
     """
     try:
-        # Convert input data to string for the prompt
         data_dump = json.dumps(input_data, indent=2)
-        
-        # Create comprehensive prompt
         user_prompt = f"""
 Analyze the following data and calculate prescribed fire risk scores.
 
@@ -164,7 +150,6 @@ INSTRUCTIONS:
 4. Return ONLY the statistics object with scores from 0.00 to 1.00 for each category.
 """
         
-        # Call GPT-5 (o3-mini) with reasoning model
         resp = client.chat.completions.create(
             model="o4-mini",
             messages=[
@@ -175,10 +160,7 @@ INSTRUCTIONS:
             response_format={"type": "json_schema", "json_schema": JSON_SCHEMA},
         )
         
-        # Parse and return the statistics
-        result = json.loads(resp.choices[0].message.content)
-        print("PARSED FIRST")
-        return result
+        return json.loads(resp.choices[0].message.content)
         
     except Exception as e:
         print(f"Error calculating fire statistics: {e}")
@@ -187,134 +169,139 @@ INSTRUCTIONS:
 
 def calculate_threat_rating(preliminary_feasability_score, threat_rating, total_population, total_value_estimate):
     """
-    Calculate the threat rating based on the preliminary feasability score, threat rating, total population, and total value estimate.
+    Calculate the threat rating based on feasibility score, threat rating, population, and value.
+
+    Args:
+        preliminary_feasability_score (float): Preliminary feasibility score (0.0-1.0).
+        threat_rating (float): Base threat rating (0.0-1.0).
+        total_population (int): Total population in nearby areas.
+        total_value_estimate (float): Total estimated value of nearby areas.
+
+    Returns:
+        float: Calculated threat rating.
     """
-
     if total_population == 0 and total_value_estimate == 0:
-        return ((threat_rating * 0.9) + ((preliminary_feasability_score + 0.3) * 0.1))
-        
-
-    return (threat_rating) * math.sqrt(total_value_estimate) * math.log(1+total_population, 10) * (preliminary_feasability_score)
+        return (threat_rating * 0.9) + ((preliminary_feasability_score + 0.3) * 0.1)
     
-    return (threat_rating * 0.7) + ((preliminary_feasability_score + 0.3) * 0.1) + ((total_population / 52_000 + total_value_estimate / 16_650_000_000) / 6 ) * 0.2
+    return threat_rating * math.sqrt(total_value_estimate) * math.log(1 + total_population, 10) * preliminary_feasability_score
+
 
 def get_weather_data(lat, lng):
+    """
+    Fetch weather data for a given latitude and longitude.
+
+    Args:
+        lat (float): Latitude coordinate.
+        lng (float): Longitude coordinate.
+
+    Returns:
+        dict: Weather data JSON response, or None if request fails.
+    """
     url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&daily=temperature_2m_mean,soil_moisture_0_to_7cm_mean,weathercode,windspeed_10m_mean&timezone=America/Los_Angeles&temperature_unit=fahrenheit"
     try:
         response = requests.get(url, timeout=10)
-        response.raise_for_status()  # Raises an exception for bad status codes
+        response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
         print(f"Error fetching weather data: {e}")
         return None
 
+
 def get_town(lat, lng):
+    """
+    Get town/location name for given coordinates using reverse geocoding.
+
+    Args:
+        lat (float): Latitude coordinate.
+        lng (float): Longitude coordinate.
+
+    Returns:
+        dict: Location data JSON response, or None if request fails or API key is missing.
+    """
     key = os.getenv("KEY")
     if not key:
         print("Error: KEY not found in environment variables")
         return None
+    
     url = f"https://us1.locationiq.com/v1/reverse.php?key={key}&lat={lat}&lon={lng}&format=json"
     try:
         response = requests.get(url, timeout=10)
-        response.raise_for_status()  # Raises an exception for bad status codes
+        response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
         print(f"Error fetching location data: {e}")
         return None
 
+
 def generate_v1_dummy_data():
     """
-    Generate dummy data matching the v1 endpoint schema.
+    Generate burn area data matching the v1 endpoint schema.
+
+    Returns:
+        list: List of burn area dictionaries, each containing coordinates, statistics,
+              threat ratings, weather data, and nearby town information.
     """
-    # Sample town names for generating dummy data
-    nearby_town_names = [
-        "Hillsborough", "Valley Springs", "Forest Hills", "Meadowbrook",
-        "Canyon Ridge", "Desert View", "Mountain Peak", "River Bend",
-        "Coastal Bay", "Prairie Town", "Timberland", "Silver Lake"
-    ]
-
-    threat_rating = random.uniform(0.0, 1.0)
-
-    # Taken from model
     california_coords = [
-       {"cords": (-122.705376, 39.997488), "probability": 0.0523},
-       {"cords": (-122.741309, 40.051387), "probability": 0.0523},
-       {"cords": (-116.102759, 33.448770), "probability": 0.0510},
-       {"cords": (-122.867073, 39.853758), "probability": 0.0501},
-       {"cords": (-123.639624, 41.524624), "probability": 0.0493},
-       {"cords": (-123.010803, 39.638162), "probability": 0.0493},
-       {"cords": (-119.920599, 36.556940), "probability": 0.0479},
-       {"cords": (-121.025527, 36.071850), "probability": 0.0441},
-       {"cords": (-123.666574, 41.497675), "probability": 0.0438},
-       {"cords": (-118.402446, 34.580647), "probability": 0.0428},
+        {"cords": (-122.705376, 39.997488), "probability": 0.0523},
+        {"cords": (-122.741309, 40.051387), "probability": 0.0523},
+        {"cords": (-116.102759, 33.448770), "probability": 0.0510},
+        {"cords": (-122.867073, 39.853758), "probability": 0.0501},
+        {"cords": (-123.639624, 41.524624), "probability": 0.0493},
+        {"cords": (-123.010803, 39.638162), "probability": 0.0493},
+        {"cords": (-119.920599, 36.556940), "probability": 0.0479},
+        {"cords": (-121.025527, 36.071850), "probability": 0.0441},
+        {"cords": (-123.666574, 41.497675), "probability": 0.0438},
+        {"cords": (-118.402446, 34.580647), "probability": 0.0428},
     ]
-    # Generate random burn area data
+    
     burn_areas = []
-    for i in california_coords:  # Generate 4 random burn areas
-        lng, lat = i["cords"]
+    for coord_data in california_coords:
+        lng, lat = coord_data["cords"]
+        threat_rating = coord_data["probability"]
         
-        # Generate ID
         area_id = math.floor(lat * lng) * math.floor(0.2 * lng * lat) + math.floor(random.random() * 1000)
-        
-        # Generate random last burn date (within last 5 years)
-        days_ago = random.randint(0, 1825)  # 5 years
+        days_ago = random.randint(0, 1825)
         last_burn_date = (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
         
-                
-        # Generate threat ratings (random predictions from malco model)
-        threat_rating = i["probability"]
-        
-        # Generate nearby towns (1-4 towns)
-        num_towns = random.randint(1, 4)
         nearby_towns = location_to_neighbor_values(lat, lng)
-        
         total_population = sum(town["population"] for town in nearby_towns)
         total_value_estimate = sum(town["value-estimate"] for town in nearby_towns)
-
+        
         town = get_town(lat, lng)
-
-        town_name = "N/A"
-
-        if town:
-            town_name = town.get("display_name")
-
+        town_name = town.get("display_name") if town else "N/A"
+        weather_data = get_weather_data(lat, lng)
+        
         dump_data = {
-            "coordinates": {
-                "lat": lat,
-                "lng": lng
-            },
+            "coordinates": {"lat": lat, "lng": lng},
             "id": area_id,
             "last-burn-date": last_burn_date,
             "name": town_name,
-            "weather": get_weather_data(lat, lng),
+            "weather": weather_data,
             "threat-rating": threat_rating,
             "nearby-towns": nearby_towns,
             "total-population": total_population,
             "total-value-estimate": total_value_estimate
         }
-
-        # Generate statistics (all float values from 0-1)
+        
         statistics = calculate_fire_statistics(dump_data)
-
-
-        # Calculate preliminary feasibility score (average of all statistics)
         stat_values = list(statistics['statistics'].values())
-        # Clamp the score to ensure it's between 0 and 1
         preliminary_feasability_score = 1 - (round(sum(stat_values) / len(stat_values), 3))
-
+        
         burn_area = {
-            "coordinates": {
-                "lat": lat,
-                "lng": lng
-            },
+            "coordinates": {"lat": lat, "lng": lng},
             "id": area_id,
             "last-burn-date": last_burn_date,
             "name": town_name,
             "statistics": statistics['statistics'],
             "preliminary-feasability-score": preliminary_feasability_score,
-            "weather": get_weather_data(lat, lng),
+            "weather": weather_data,
             "threat-rating": threat_rating,
-            "calculated-threat-rating": calculate_threat_rating(preliminary_feasability_score, threat_rating, total_population, total_value_estimate),
+            "calculated-threat-rating": calculate_threat_rating(
+                preliminary_feasability_score, 
+                threat_rating, 
+                total_population, 
+                total_value_estimate
+            ),
             "nearby-towns": nearby_towns,
             "total-population": total_population,
             "total-value-estimate": total_value_estimate
@@ -324,9 +311,10 @@ def generate_v1_dummy_data():
     
     return burn_areas
 
+
 def main():
     """
-    Generate the data and save it to a JSON file.
+    Generate burn area data and save it to a JSON file.
     """
     print("Generating burn area data...")
     burn_areas = generate_v1_dummy_data()
@@ -336,13 +324,13 @@ def main():
         "data": burn_areas
     }
     
-    # Save to JSON file
     output_file = "precomputed_data.json"
     with open(output_file, 'w') as f:
         json.dump(v1_response, f, indent=2)
     
     print(f"Data generated and saved to {output_file}")
     print(f"Generated {len(burn_areas)} burn areas")
+
 
 if __name__ == "__main__":
     main()

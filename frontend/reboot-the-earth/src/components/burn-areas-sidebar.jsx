@@ -19,6 +19,43 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Normalizes a value from 0-1 scale to 0-10 scale if needed.
+ * @param {number} value - The value to normalize
+ * @returns {number} Normalized value on 0-10 scale
+ */
+const normalizeToTen = (value) => (value < 1 ? value * 10 : value);
+
+/**
+ * Returns Tailwind CSS classes for threat level colors based on a 0-10 scale.
+ * @param {number} level - Threat level (0-10 scale)
+ * @returns {string} Tailwind CSS classes for the threat level color
+ */
+const getThreatColor = (level) => {
+	const normalizedLevel = normalizeToTen(level);
+	if (normalizedLevel <= 2)
+		return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+	if (normalizedLevel <= 4)
+		return "bg-green-500/20 text-green-400 border-green-500/30";
+	if (normalizedLevel <= 6)
+		return "bg-amber-500/20 text-amber-400 border-amber-500/30";
+	if (normalizedLevel <= 8)
+		return "bg-orange-500/20 text-orange-400 border-orange-500/30";
+	return "bg-red-500/20 text-red-400 border-red-500/30";
+};
+
+/**
+ * Sidebar component for displaying and managing burn areas.
+ * @param {Object} props - Component props
+ * @param {Array<Object>} props.areas - Array of burn area objects
+ * @param {string|number} props.selectedAreaId - ID of the currently selected area
+ * @param {Function} props.onSelectArea - Callback when an area is selected
+ * @param {string} props.sortBy - Current sort option ("threat", "date", "name")
+ * @param {Function} props.onSortChange - Callback when sort option changes
+ * @param {number|null} props.filterThreat - Current threat level filter (null for all)
+ * @param {Function} props.onFilterChange - Callback when threat filter changes
+ * @returns {JSX.Element} The sidebar component
+ */
 export function BurnAreasSidebar({
 	areas,
 	selectedAreaId,
@@ -34,31 +71,8 @@ export function BurnAreasSidebar({
 		area.name.toLowerCase().includes(searchQuery.toLowerCase())
 	);
 
-	const getThreatColor = (level) => {
-		// Normalize level to 0-10 scale if it's in 0-1 range
-		const normalizedLevel = level < 1 ? level * 10 : level;
-		if (normalizedLevel <= 2)
-			return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
-		if (normalizedLevel <= 4)
-			return "bg-green-500/20 text-green-400 border-green-500/30";
-		if (normalizedLevel <= 6)
-			return "bg-amber-500/20 text-amber-400 border-amber-500/30";
-		if (normalizedLevel <= 8)
-			return "bg-orange-500/20 text-orange-400 border-orange-500/30";
-		return "bg-red-500/20 text-red-400 border-red-500/30";
-	};
-
-	const getThreatLabel = (level) => {
-		if (level === 1) return "Very Low";
-		if (level === 2) return "Low";
-		if (level === 3) return "Moderate";
-		if (level === 4) return "High";
-		return "Critical";
-	};
-
 	return (
 		<div className="w-[400px] border-r border-border bg-card flex flex-col h-full">
-			{/* Header */}
 			<div className="p-6 border-b border-border">
 				<div className="flex items-center gap-3 mb-6">
 					<div className="p-2 rounded-lg bg-orange-500/10">
@@ -70,7 +84,6 @@ export function BurnAreasSidebar({
 					</div>
 				</div>
 
-				{/* Search */}
 				<div className="relative mb-4">
 					<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 					<Input
@@ -81,7 +94,6 @@ export function BurnAreasSidebar({
 					/>
 				</div>
 
-				{/* Filters */}
 				<div className="flex gap-2">
 					<Select value={sortBy} onValueChange={(v) => onSortChange(v)}>
 						<SelectTrigger className="flex-1 bg-background border-border">
@@ -114,7 +126,6 @@ export function BurnAreasSidebar({
 					</Select>
 				</div>
 			</div>
-			{/* Areas List */}
 			<div className="flex-1 overflow-y-auto">
 				<Accordion type="single" collapsible className="w-full">
 					{filteredAreas.map((area) => (
@@ -140,25 +151,19 @@ export function BurnAreasSidebar({
 											getThreatColor(area["calculated-threat-rating"])
 										)}
 									>
-										{(() => {
-											const rating = area["calculated-threat-rating"];
-											const normalized = rating < 1 ? rating * 10 : rating;
-											return normalized.toFixed(2);
-										})()}
+										{normalizeToTen(area["calculated-threat-rating"]).toFixed(2)}
 									</Badge>
 								</div>
 							</AccordionTrigger>
 							<AccordionContent className="pb-4">
 								<div className="space-y-3 pt-2">
-									{/* Score */}
 									<div>
 										<p className="text-xs font-medium text-muted-foreground mb-1">
 											Risk of Ignition
 										</p>
-										<StatBadge label={"Risk"} value={area["threat-rating"]} />
+										<StatBadge label="Risk" value={area["threat-rating"]} />
 									</div>
 
-									{/* Statistics */}
 									<div className="space-y-2">
 										<p className="text-xs font-medium text-muted-foreground">
 											Risk Statistics
@@ -205,10 +210,9 @@ export function BurnAreasSidebar({
 										</div>
 									</div>
 
-									{/* Statistics */}
 									<div className="space-y-2">
 										<p className="text-xs font-medium text-muted-foreground">
-											Risk Statistics
+											Additional Information
 										</p>
 										<div className="grid grid-cols-2 gap-2">
 											<StatBadge
@@ -224,24 +228,15 @@ export function BurnAreasSidebar({
 										</div>
 									</div>
 
-									{/* Feasibility Score */}
 									<div>
 										<p className="text-xs font-medium text-muted-foreground mb-1">
 											Feasibility Score
 										</p>
 										<p className="text-sm text-foreground font-semibold">
-											{(() => {
-												const score = area["preliminary-feasability-score"];
-												console.log(score);
-												// Normalize from 0-1 to 1-10 scale: (value * 9) + 1
-												const normalized = score < 1 ? score * 10 : score;
-												return normalized.toFixed(2);
-											})()}
-											/10
+											{normalizeToTen(area["preliminary-feasability-score"]).toFixed(2)}/10
 										</p>
 									</div>
 
-									{/* Last Burn Date */}
 									<div>
 										<p className="text-xs font-medium text-muted-foreground mb-1">
 											Last Burn Date
@@ -255,7 +250,6 @@ export function BurnAreasSidebar({
 										</p>
 									</div>
 
-									{/* Weather */}
 									<div>
 										<p className="text-xs font-medium text-muted-foreground mb-1">
 											Weather
@@ -273,7 +267,6 @@ export function BurnAreasSidebar({
 										</p>
 									</div>
 
-									{/* Nearby Towns */}
 									{area["nearby-towns"] && area["nearby-towns"].length > 0 && (
 										<div>
 											<p className="text-xs font-medium text-muted-foreground mb-1">
@@ -289,7 +282,6 @@ export function BurnAreasSidebar({
 										</div>
 									)}
 
-									{/* View on Map Button */}
 									<Button
 										variant="outline"
 										size="sm"
@@ -304,7 +296,6 @@ export function BurnAreasSidebar({
 					))}
 				</Accordion>
 			</div>
-			{/* Legend */}
 			<div className="p-6 border-t border-border bg-card">
 				<p className="text-xs font-medium text-muted-foreground mb-3">
 					Threat Levels (0-10)
@@ -346,12 +337,17 @@ export function BurnAreasSidebar({
 	);
 }
 
+/**
+ * Displays a statistic badge with normalized value and color coding.
+ * @param {Object} props - Component props
+ * @param {string} props.label - Label text for the statistic
+ * @param {number} props.value - Statistic value (0-1 or 0-10 scale)
+ * @param {boolean} [props.hide_10] - If true, omits "/10" suffix from display
+ * @returns {JSX.Element} The statistic badge component
+ */
 function StatBadge({ label, value, hide_10 }) {
-	// Convert value from 0-1 range to 0-10 range with 2 decimal places
-	// If value is already in 0-10 range (>= 1), use it as-is
-	const normalizedValue = value >= 1 ? value : value * 10;
+	const normalizedValue = normalizeToTen(value);
 	const displayValue = normalizedValue.toFixed(2);
-	const numericValue = parseFloat(normalizedValue);
 
 	const getColor = (val) => {
 		if (val <= 4)
@@ -362,7 +358,7 @@ function StatBadge({ label, value, hide_10 }) {
 
 	return (
 		<div
-			className={cn("px-2 py-1 rounded border text-xs", getColor(numericValue))}
+			className={cn("px-2 py-1 rounded border text-xs", getColor(normalizedValue))}
 		>
 			<div className="font-medium">{label}</div>
 			<div className="font-semibold">{displayValue + (hide_10 ? "" : "/10")}</div>
