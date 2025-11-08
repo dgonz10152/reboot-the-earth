@@ -189,8 +189,12 @@ def calculate_threat_rating(preliminary_feasability_score, threat_rating, total_
     """
     Calculate the threat rating based on the preliminary feasability score, threat rating, total population, and total value estimate.
     """
+
     if total_population == 0 and total_value_estimate == 0:
         return ((threat_rating * 0.9) + ((preliminary_feasability_score + 0.3) * 0.1))
+        
+
+    return (threat_rating) * math.sqrt(total_value_estimate) * math.log(1+total_population, 10) * (preliminary_feasability_score)
     
     return (threat_rating * 0.7) + ((preliminary_feasability_score + 0.3) * 0.1) + ((total_population / 52_000 + total_value_estimate / 16_650_000_000) / 6 ) * 0.2
 
@@ -231,31 +235,25 @@ def generate_v1_dummy_data():
 
     threat_rating = random.uniform(0.0, 1.0)
 
+    # Taken from model
     california_coords = [
-        (32.534156, -117.127221),  # San Diego
-        (33.953349, -117.396156),  # Riverside
-        (34.052235, -118.243683),  # Los Angeles
-        (36.778259, -119.417931),  # Central California
-        (37.774929, -122.419418),  # San Francisco
-        (38.581572, -121.494400),  # Sacramento
-        (39.728494, -121.837478),  # Chico
-        (40.586540, -122.391675),  # Redding
-        (41.745870, -122.634075),  # Mount Shasta
-        (34.420830, -119.698189),  # Santa Barbara
-        (36.974117, -122.030792),  # Santa Cruz
-        (32.715736, -117.161087),  # Another point in San Diego
-        (38.440429, -122.714054),  # Santa Rosa
-        (34.108345, -117.289765),  # San Bernardino
-        (36.737797, -119.787125),  # Fresno
+       {"cords": (-122.705376, 39.997488), "probability": 0.0523},
+       {"cords": (-122.741309, 40.051387), "probability": 0.0523},
+       {"cords": (-116.102759, 33.448770), "probability": 0.0510},
+       {"cords": (-122.867073, 39.853758), "probability": 0.0501},
+       {"cords": (-123.639624, 41.524624), "probability": 0.0493},
+       {"cords": (-123.010803, 39.638162), "probability": 0.0493},
+       {"cords": (-119.920599, 36.556940), "probability": 0.0479},
+       {"cords": (-121.025527, 36.071850), "probability": 0.0441},
+       {"cords": (-123.666574, 41.497675), "probability": 0.0438},
+       {"cords": (-118.402446, 34.580647), "probability": 0.0428},
     ]
- 
     # Generate random burn area data
     burn_areas = []
-    for i in range(4):  # Generate 4 random burn areas
-        lat, lng = random.choice(california_coords)
+    for i in california_coords:  # Generate 4 random burn areas
+        lng, lat = i["cords"]
         
-        #TODO: CHANGE AREA AND BURN DAYS
-        # Generate random ID
+        # Generate ID
         area_id = math.floor(lat * lng) * math.floor(0.2 * lng * lat) + math.floor(random.random() * 1000)
         
         # Generate random last burn date (within last 5 years)
@@ -264,7 +262,7 @@ def generate_v1_dummy_data():
         
                 
         # Generate threat ratings (random predictions from malco model)
-        threat_rating = round(random.uniform(0.0, 1.0), 3)
+        threat_rating = i["probability"]
         
         # Generate nearby towns (1-4 towns)
         num_towns = random.randint(1, 4)

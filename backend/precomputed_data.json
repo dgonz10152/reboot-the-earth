@@ -1,267 +1,915 @@
 {
-	"status": "success",
-	"data": [
-		{
-			"coordinates": {
-				"lat": 40.58654,
-				"lng": -122.391675
-			},
-			"id": 4938940,
-			"last-burn-date": "2025-06-17",
-			"name": "Market Street, Redding, Shasta County, California, 96001, USA",
-			"statistics": {
-				"safety": 0.2,
-				"fire-behavior": 0.5,
-				"resistance-to-containment": 0.5,
-				"ignition-procedures-and-methods": 0.2,
-				"prescribed-fire-duration": 0.2,
-				"smoke-management": 0.5,
-				"number-and-dependence-of-activities": 0.5,
-				"management-organizations": 0.5,
-				"treatment-resource-objectives": 0.5,
-				"constraints": 0.5,
-				"project-logistics": 0.5
-			},
-			"preliminary-feasability-score": 0.5820000000000001,
-			"weather": {
-				"latitude": 40.597637,
-				"longitude": -122.37954,
-				"generationtime_ms": 0.5407333374023438,
-				"utc_offset_seconds": -28800,
-				"timezone": "America/Los_Angeles",
-				"timezone_abbreviation": "GMT-8",
-				"elevation": 172.0,
-				"daily_units": {
-					"time": "iso8601",
-					"temperature_2m_mean": "\u00b0F",
-					"soil_moisture_0_to_7cm_mean": "undefined",
-					"weathercode": "wmo code",
-					"windspeed_10m_mean": "km/h"
-				},
-				"daily": {
-					"time": [
-						"2025-11-08",
-						"2025-11-09",
-						"2025-11-10",
-						"2025-11-11",
-						"2025-11-12",
-						"2025-11-13",
-						"2025-11-14"
-					],
-					"temperature_2m_mean": [59.9, 62.7, 63.1, 61.8, 59.0, 52.8, 46.1],
-					"soil_moisture_0_to_7cm_mean": [null, null, null, null, null, null, null],
-					"weathercode": [3, 3, 3, 3, 53, 81, 3],
-					"windspeed_10m_mean": [9.6, 5.1, 6.2, 5.0, 5.8, 17.8, 3.7]
-				}
-			},
-			"threat-rating": 0.222,
-			"calculated-threat-rating": 0.3092438774533369,
-			"nearby-towns": [
-				{
-					"name": "Redding",
-					"lat": 40.5863563,
-					"lng": -122.391675,
-					"population": 91582,
-					"value-estimate": 3465264864.864865
-				}
-			],
-			"total-population": 91582,
-			"total-value-estimate": 3465264864.864865
-		},
-		{
-			"coordinates": {
-				"lat": 40.58654,
-				"lng": -122.391675
-			},
-			"id": 4939011,
-			"last-burn-date": "2021-07-27",
-			"name": "Market Street, Redding, Shasta County, California, 96001, USA",
-			"statistics": {
-				"statistics": {
-					"safety": 0.5,
-					"fire-behavior": 0.5,
-					"resistance-to-containment": 0.8,
-					"ignition-procedures-and-methods": 0.5,
-					"prescribed-fire-duration": 0.5,
-					"smoke-management": 0.8,
-					"number-and-dependence-of-activities": 0.5,
-					"management-organizations": 0.5,
-					"treatment-resource-objectives": 0.5,
-					"constraints": 0.8,
-					"project-logistics": 0.5
-				}
-			},
-			"preliminary-feasability-score": 0.41800000000000004,
-			"weather": {
-				"latitude": 40.597637,
-				"longitude": -122.37954,
-				"generationtime_ms": 0.3660917282104492,
-				"utc_offset_seconds": -28800,
-				"timezone": "America/Los_Angeles",
-				"timezone_abbreviation": "GMT-8",
-				"elevation": 172.0,
-				"daily_units": {
-					"time": "iso8601",
-					"temperature_2m_mean": "\u00b0F",
-					"soil_moisture_0_to_7cm_mean": "undefined",
-					"weathercode": "wmo code",
-					"windspeed_10m_mean": "km/h"
-				},
-				"daily": {
-					"time": [
-						"2025-11-08",
-						"2025-11-09",
-						"2025-11-10",
-						"2025-11-11",
-						"2025-11-12",
-						"2025-11-13",
-						"2025-11-14"
-					],
-					"temperature_2m_mean": [59.9, 62.7, 63.1, 61.8, 59.0, 52.8, 46.1],
-					"soil_moisture_0_to_7cm_mean": [null, null, null, null, null, null, null],
-					"weathercode": [3, 3, 3, 3, 53, 81, 3],
-					"windspeed_10m_mean": [9.6, 5.1, 6.2, 5.0, 5.8, 17.8, 3.7]
-				}
-			},
-			"threat-rating": 0.581,
-			"calculated-threat-rating": 0.5441438774533368,
-			"nearby-towns": [
-				{
-					"name": "Redding",
-					"lat": 40.5863563,
-					"lng": -122.391675,
-					"population": 91582,
-					"value-estimate": 3465264864.864865
-				}
-			],
-			"total-population": 91582,
-			"total-value-estimate": 3465264864.864865
-		},
-		{
-			"coordinates": {
-				"lat": 36.778259,
-				"lng": -119.417931
-			},
-			"id": 3860803,
-			"last-burn-date": "2024-04-09",
-			"name": "Terrace Avenue, Minkler, Fresno County, California, 93657, USA",
-			"statistics": {
-				"safety": 0.2,
-				"fire-behavior": 0.2,
-				"resistance-to-containment": 0.2,
-				"ignition-procedures-and-methods": 0.2,
-				"prescribed-fire-duration": 0.2,
-				"smoke-management": 0.2,
-				"number-and-dependence-of-activities": 0.2,
-				"management-organizations": 0.2,
-				"treatment-resource-objectives": 0.2,
-				"constraints": 0.2,
-				"project-logistics": 0.2
-			},
-			"preliminary-feasability-score": 0.8,
-			"weather": {
-				"latitude": 36.765133,
-				"longitude": -119.425156,
-				"generationtime_ms": 0.5750656127929688,
-				"utc_offset_seconds": -28800,
-				"timezone": "America/Los_Angeles",
-				"timezone_abbreviation": "GMT-8",
-				"elevation": 144.0,
-				"daily_units": {
-					"time": "iso8601",
-					"temperature_2m_mean": "\u00b0F",
-					"soil_moisture_0_to_7cm_mean": "undefined",
-					"weathercode": "wmo code",
-					"windspeed_10m_mean": "km/h"
-				},
-				"daily": {
-					"time": [
-						"2025-11-08",
-						"2025-11-09",
-						"2025-11-10",
-						"2025-11-11",
-						"2025-11-12",
-						"2025-11-13",
-						"2025-11-14"
-					],
-					"temperature_2m_mean": [62.5, 67.1, 68.7, 68.3, 67.8, 59.5, 52.1],
-					"soil_moisture_0_to_7cm_mean": [null, null, null, null, null, null, null],
-					"weathercode": [2, 0, 3, 3, 3, 55, 51],
-					"windspeed_10m_mean": [4.9, 5.6, 5.7, 4.9, 6.6, 10.8, 7.2]
-				}
-			},
-			"threat-rating": 0.271,
-			"calculated-threat-rating": 0.35390000000000005,
-			"nearby-towns": [],
-			"total-population": 0,
-			"total-value-estimate": 0
-		},
-		{
-			"coordinates": {
-				"lat": 36.737797,
-				"lng": -119.787125
-			},
-			"id": 3877691,
-			"last-burn-date": "2025-02-19",
-			"name": "Mariposa Street, Fresno, Fresno County, California, 93721, USA",
-			"statistics": {
-				"safety": 0.8,
-				"fire-behavior": 0.5,
-				"resistance-to-containment": 0.5,
-				"ignition-procedures-and-methods": 0.5,
-				"prescribed-fire-duration": 0.5,
-				"smoke-management": 0.8,
-				"number-and-dependence-of-activities": 0.5,
-				"management-organizations": 0.5,
-				"treatment-resource-objectives": 0.5,
-				"constraints": 0.8,
-				"project-logistics": 0.5
-			},
-			"preliminary-feasability-score": 0.41800000000000004,
-			"weather": {
-				"latitude": 36.74694,
-				"longitude": -119.80077,
-				"generationtime_ms": 0.3504753112792969,
-				"utc_offset_seconds": -28800,
-				"timezone": "America/Los_Angeles",
-				"timezone_abbreviation": "GMT-8",
-				"elevation": 91.0,
-				"daily_units": {
-					"time": "iso8601",
-					"temperature_2m_mean": "\u00b0F",
-					"soil_moisture_0_to_7cm_mean": "undefined",
-					"weathercode": "wmo code",
-					"windspeed_10m_mean": "km/h"
-				},
-				"daily": {
-					"time": [
-						"2025-11-08",
-						"2025-11-09",
-						"2025-11-10",
-						"2025-11-11",
-						"2025-11-12",
-						"2025-11-13",
-						"2025-11-14"
-					],
-					"temperature_2m_mean": [62.4, 65.2, 67.4, 72.9, 72.0, 61.7, 56.2],
-					"soil_moisture_0_to_7cm_mean": [null, null, null, null, null, null, null],
-					"weathercode": [3, 45, 3, 3, 3, 51, 51],
-					"windspeed_10m_mean": [4.3, 4.4, 4.4, 4.3, 11.1, 16.4, 8.3]
-				}
-			},
-			"threat-rating": 0.929,
-			"calculated-threat-rating": 1.1009535904836876,
-			"nearby-towns": [
-				{
-					"name": "Fresno",
-					"lat": 36.7394421,
-					"lng": -119.78483,
-					"population": 520052,
-					"value-estimate": 22720718446.601944
-				}
-			],
-			"total-population": 520052,
-			"total-value-estimate": 22720718446.601944
-		}
-	]
+  "status": "success",
+  "data": [
+    {
+      "coordinates": {
+        "lat": 39.997488,
+        "lng": -122.705376
+      },
+      "id": 4820167,
+      "last-burn-date": "2024-07-18",
+      "name": "Elder Creek Road, Red Bluff, Tehama County, California, 96080, USA",
+      "statistics": {
+        "safety": 0.2,
+        "fire-behavior": 0.5,
+        "resistance-to-containment": 0.5,
+        "ignition-procedures-and-methods": 0.2,
+        "prescribed-fire-duration": 0.2,
+        "smoke-management": 0.2,
+        "number-and-dependence-of-activities": 0.2,
+        "management-organizations": 0.5,
+        "treatment-resource-objectives": 0.5,
+        "constraints": 0.5,
+        "project-logistics": 0.5
+      },
+      "preliminary-feasability-score": 0.636,
+      "weather": {
+        "latitude": 39.99543,
+        "longitude": -122.709816,
+        "generationtime_ms": 0.4184246063232422,
+        "utc_offset_seconds": -28800,
+        "timezone": "America/Los_Angeles",
+        "timezone_abbreviation": "GMT-8",
+        "elevation": 1375.0,
+        "daily_units": {
+          "time": "iso8601",
+          "temperature_2m_mean": "\u00b0F",
+          "soil_moisture_0_to_7cm_mean": "undefined",
+          "weathercode": "wmo code",
+          "windspeed_10m_mean": "km/h"
+        },
+        "daily": {
+          "time": [
+            "2025-11-08",
+            "2025-11-09",
+            "2025-11-10",
+            "2025-11-11",
+            "2025-11-12",
+            "2025-11-13",
+            "2025-11-14"
+          ],
+          "temperature_2m_mean": [
+            56.0,
+            57.6,
+            57.9,
+            55.2,
+            48.2,
+            38.6,
+            33.3
+          ],
+          "soil_moisture_0_to_7cm_mean": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "weathercode": [
+            3,
+            3,
+            3,
+            3,
+            63,
+            81,
+            3
+          ],
+          "windspeed_10m_mean": [
+            6.4,
+            8.5,
+            9.4,
+            5.1,
+            6.8,
+            10.1,
+            6.2
+          ]
+        }
+      },
+      "threat-rating": 0.0523,
+      "calculated-threat-rating": 0.14067000000000002,
+      "nearby-towns": [],
+      "total-population": 0,
+      "total-value-estimate": 0
+    },
+    {
+      "coordinates": {
+        "lat": 40.051387,
+        "lng": -122.741309
+      },
+      "id": 4838003,
+      "last-burn-date": "2022-07-24",
+      "name": "Tehama County, California, USA",
+      "statistics": {
+        "safety": 0.5,
+        "fire-behavior": 0.5,
+        "resistance-to-containment": 0.5,
+        "ignition-procedures-and-methods": 0.5,
+        "prescribed-fire-duration": 0.5,
+        "smoke-management": 0.5,
+        "number-and-dependence-of-activities": 0.5,
+        "management-organizations": 0.5,
+        "treatment-resource-objectives": 0.5,
+        "constraints": 0.5,
+        "project-logistics": 0.5
+      },
+      "preliminary-feasability-score": 0.5,
+      "weather": {
+        "latitude": 40.04737,
+        "longitude": -122.728874,
+        "generationtime_ms": 0.3305673599243164,
+        "utc_offset_seconds": -28800,
+        "timezone": "America/Los_Angeles",
+        "timezone_abbreviation": "GMT-8",
+        "elevation": 1390.0,
+        "daily_units": {
+          "time": "iso8601",
+          "temperature_2m_mean": "\u00b0F",
+          "soil_moisture_0_to_7cm_mean": "undefined",
+          "weathercode": "wmo code",
+          "windspeed_10m_mean": "km/h"
+        },
+        "daily": {
+          "time": [
+            "2025-11-08",
+            "2025-11-09",
+            "2025-11-10",
+            "2025-11-11",
+            "2025-11-12",
+            "2025-11-13",
+            "2025-11-14"
+          ],
+          "temperature_2m_mean": [
+            54.8,
+            56.9,
+            58.4,
+            55.5,
+            48.0,
+            38.6,
+            32.9
+          ],
+          "soil_moisture_0_to_7cm_mean": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "weathercode": [
+            3,
+            3,
+            3,
+            3,
+            63,
+            71,
+            3
+          ],
+          "windspeed_10m_mean": [
+            6.8,
+            7.7,
+            5.9,
+            5.8,
+            8.2,
+            10.4,
+            6.2
+          ]
+        }
+      },
+      "threat-rating": 0.0523,
+      "calculated-threat-rating": 0.12707000000000002,
+      "nearby-towns": [],
+      "total-population": 0,
+      "total-value-estimate": 0
+    },
+    {
+      "coordinates": {
+        "lat": 33.44877,
+        "lng": -116.102759
+      },
+      "id": 3017892,
+      "last-burn-date": "2022-11-29",
+      "name": "89434, 83rd Avenue, Oasis, Riverside County, California, 92274, USA",
+      "statistics": {
+        "safety": 0.5,
+        "fire-behavior": 0.5,
+        "resistance-to-containment": 0.5,
+        "ignition-procedures-and-methods": 0.5,
+        "prescribed-fire-duration": 0.5,
+        "smoke-management": 0.5,
+        "number-and-dependence-of-activities": 0.5,
+        "management-organizations": 0.5,
+        "treatment-resource-objectives": 0.5,
+        "constraints": 0.5,
+        "project-logistics": 0.5
+      },
+      "preliminary-feasability-score": 0.5,
+      "weather": {
+        "latitude": 33.45629,
+        "longitude": -116.09107,
+        "generationtime_ms": 0.44417381286621094,
+        "utc_offset_seconds": -28800,
+        "timezone": "America/Los_Angeles",
+        "timezone_abbreviation": "GMT-8",
+        "elevation": -13.0,
+        "daily_units": {
+          "time": "iso8601",
+          "temperature_2m_mean": "\u00b0F",
+          "soil_moisture_0_to_7cm_mean": "undefined",
+          "weathercode": "wmo code",
+          "windspeed_10m_mean": "km/h"
+        },
+        "daily": {
+          "time": [
+            "2025-11-08",
+            "2025-11-09",
+            "2025-11-10",
+            "2025-11-11",
+            "2025-11-12",
+            "2025-11-13",
+            "2025-11-14"
+          ],
+          "temperature_2m_mean": [
+            73.9,
+            76.4,
+            77.7,
+            79.2,
+            77.9,
+            77.3,
+            66.7
+          ],
+          "soil_moisture_0_to_7cm_mean": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "weathercode": [
+            0,
+            0,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "windspeed_10m_mean": [
+            8.1,
+            6.4,
+            7.2,
+            5.1,
+            5.4,
+            5.9,
+            14.4
+          ]
+        }
+      },
+      "threat-rating": 0.051,
+      "calculated-threat-rating": 0.1259,
+      "nearby-towns": [],
+      "total-population": 0,
+      "total-value-estimate": 0
+    },
+    {
+      "coordinates": {
+        "lat": 39.853758,
+        "lng": -122.867073
+      },
+      "id": 4799148,
+      "last-burn-date": "2022-12-03",
+      "name": "Side Rod Road, Tehama County, California, USA",
+      "statistics": {
+        "safety": 0.2,
+        "fire-behavior": 0.5,
+        "resistance-to-containment": 0.8,
+        "ignition-procedures-and-methods": 0.5,
+        "prescribed-fire-duration": 0.5,
+        "smoke-management": 0.5,
+        "number-and-dependence-of-activities": 0.2,
+        "management-organizations": 0.5,
+        "treatment-resource-objectives": 0.5,
+        "constraints": 0.5,
+        "project-logistics": 0.5
+      },
+      "preliminary-feasability-score": 0.527,
+      "weather": {
+        "latitude": 39.847694,
+        "longitude": -122.874725,
+        "generationtime_ms": 0.5230903625488281,
+        "utc_offset_seconds": -28800,
+        "timezone": "America/Los_Angeles",
+        "timezone_abbreviation": "GMT-8",
+        "elevation": 1377.0,
+        "daily_units": {
+          "time": "iso8601",
+          "temperature_2m_mean": "\u00b0F",
+          "soil_moisture_0_to_7cm_mean": "undefined",
+          "weathercode": "wmo code",
+          "windspeed_10m_mean": "km/h"
+        },
+        "daily": {
+          "time": [
+            "2025-11-08",
+            "2025-11-09",
+            "2025-11-10",
+            "2025-11-11",
+            "2025-11-12",
+            "2025-11-13",
+            "2025-11-14"
+          ],
+          "temperature_2m_mean": [
+            55.3,
+            56.7,
+            58.0,
+            55.1,
+            48.2,
+            38.5,
+            33.3
+          ],
+          "soil_moisture_0_to_7cm_mean": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "weathercode": [
+            3,
+            3,
+            3,
+            3,
+            63,
+            81,
+            45
+          ],
+          "windspeed_10m_mean": [
+            4.3,
+            6.0,
+            6.9,
+            5.1,
+            6.8,
+            10.1,
+            6.2
+          ]
+        }
+      },
+      "threat-rating": 0.0501,
+      "calculated-threat-rating": 0.12779,
+      "nearby-towns": [],
+      "total-population": 0,
+      "total-value-estimate": 0
+    },
+    {
+      "coordinates": {
+        "lat": 41.524624,
+        "lng": -123.639624
+      },
+      "id": 5273776,
+      "last-burn-date": "2025-05-24",
+      "name": "Gasquet-Orleans Road, Happy Camp, Siskiyou County, California, 96039, USA",
+      "statistics": {
+        "safety": 0.2,
+        "fire-behavior": 0.5,
+        "resistance-to-containment": 0.2,
+        "ignition-procedures-and-methods": 0.2,
+        "prescribed-fire-duration": 0.5,
+        "smoke-management": 0.5,
+        "number-and-dependence-of-activities": 0.2,
+        "management-organizations": 0.5,
+        "treatment-resource-objectives": 0.5,
+        "constraints": 0.8,
+        "project-logistics": 0.8
+      },
+      "preliminary-feasability-score": 0.5549999999999999,
+      "weather": {
+        "latitude": 41.535404,
+        "longitude": -123.62523,
+        "generationtime_ms": 0.4914999008178711,
+        "utc_offset_seconds": -28800,
+        "timezone": "America/Los_Angeles",
+        "timezone_abbreviation": "GMT-8",
+        "elevation": 1182.0,
+        "daily_units": {
+          "time": "iso8601",
+          "temperature_2m_mean": "\u00b0F",
+          "soil_moisture_0_to_7cm_mean": "undefined",
+          "weathercode": "wmo code",
+          "windspeed_10m_mean": "km/h"
+        },
+        "daily": {
+          "time": [
+            "2025-11-08",
+            "2025-11-09",
+            "2025-11-10",
+            "2025-11-11",
+            "2025-11-12",
+            "2025-11-13",
+            "2025-11-14"
+          ],
+          "temperature_2m_mean": [
+            47.8,
+            56.1,
+            56.1,
+            51.8,
+            49.5,
+            38.2,
+            32.7
+          ],
+          "soil_moisture_0_to_7cm_mean": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "weathercode": [
+            3,
+            3,
+            3,
+            3,
+            61,
+            85,
+            51
+          ],
+          "windspeed_10m_mean": [
+            6.4,
+            5.5,
+            6.2,
+            3.9,
+            6.3,
+            5.5,
+            4.5
+          ]
+        }
+      },
+      "threat-rating": 0.0493,
+      "calculated-threat-rating": 0.12987,
+      "nearby-towns": [],
+      "total-population": 0,
+      "total-value-estimate": 0
+    },
+    {
+      "coordinates": {
+        "lat": 39.638162,
+        "lng": -123.010803
+      },
+      "id": 4759892,
+      "last-burn-date": "2023-10-17",
+      "name": "Mendocino County, California, USA",
+      "statistics": {
+        "safety": 0.8,
+        "fire-behavior": 0.8,
+        "resistance-to-containment": 0.8,
+        "ignition-procedures-and-methods": 0.5,
+        "prescribed-fire-duration": 0.5,
+        "smoke-management": 0.5,
+        "number-and-dependence-of-activities": 0.5,
+        "management-organizations": 0.5,
+        "treatment-resource-objectives": 0.5,
+        "constraints": 0.8,
+        "project-logistics": 0.8
+      },
+      "preliminary-feasability-score": 0.364,
+      "weather": {
+        "latitude": 39.64783,
+        "longitude": -123.01976,
+        "generationtime_ms": 0.3126859664916992,
+        "utc_offset_seconds": -28800,
+        "timezone": "America/Los_Angeles",
+        "timezone_abbreviation": "GMT-8",
+        "elevation": 1272.0,
+        "daily_units": {
+          "time": "iso8601",
+          "temperature_2m_mean": "\u00b0F",
+          "soil_moisture_0_to_7cm_mean": "undefined",
+          "weathercode": "wmo code",
+          "windspeed_10m_mean": "km/h"
+        },
+        "daily": {
+          "time": [
+            "2025-11-08",
+            "2025-11-09",
+            "2025-11-10",
+            "2025-11-11",
+            "2025-11-12",
+            "2025-11-13",
+            "2025-11-14"
+          ],
+          "temperature_2m_mean": [
+            58.0,
+            60.7,
+            60.5,
+            56.6,
+            49.8,
+            40.0,
+            34.3
+          ],
+          "soil_moisture_0_to_7cm_mean": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "weathercode": [
+            3,
+            3,
+            3,
+            3,
+            63,
+            81,
+            3
+          ],
+          "windspeed_10m_mean": [
+            7.8,
+            10.0,
+            5.7,
+            4.7,
+            9.5,
+            11.3,
+            5.0
+          ]
+        }
+      },
+      "threat-rating": 0.0493,
+      "calculated-threat-rating": 0.11077000000000001,
+      "nearby-towns": [],
+      "total-population": 0,
+      "total-value-estimate": 0
+    },
+    {
+      "coordinates": {
+        "lat": 36.55694,
+        "lng": -119.920599
+      },
+      "id": 3845350,
+      "last-burn-date": "2021-05-07",
+      "name": "12255, South Grantland Avenue, Caruthers, Fresno County, California, 93609, USA",
+      "statistics": {
+        "safety": 0.2,
+        "fire-behavior": 0.5,
+        "resistance-to-containment": 0.2,
+        "ignition-procedures-and-methods": 0.5,
+        "prescribed-fire-duration": 0.5,
+        "smoke-management": 0.5,
+        "number-and-dependence-of-activities": 0.2,
+        "management-organizations": 0.5,
+        "treatment-resource-objectives": 0.2,
+        "constraints": 0.5,
+        "project-logistics": 0.5
+      },
+      "preliminary-feasability-score": 0.609,
+      "weather": {
+        "latitude": 36.557453,
+        "longitude": -119.91539,
+        "generationtime_ms": 0.47278404235839844,
+        "utc_offset_seconds": -28800,
+        "timezone": "America/Los_Angeles",
+        "timezone_abbreviation": "GMT-8",
+        "elevation": 67.0,
+        "daily_units": {
+          "time": "iso8601",
+          "temperature_2m_mean": "\u00b0F",
+          "soil_moisture_0_to_7cm_mean": "undefined",
+          "weathercode": "wmo code",
+          "windspeed_10m_mean": "km/h"
+        },
+        "daily": {
+          "time": [
+            "2025-11-08",
+            "2025-11-09",
+            "2025-11-10",
+            "2025-11-11",
+            "2025-11-12",
+            "2025-11-13",
+            "2025-11-14"
+          ],
+          "temperature_2m_mean": [
+            61.2,
+            63.8,
+            66.2,
+            70.8,
+            69.3,
+            60.1,
+            53.8
+          ],
+          "soil_moisture_0_to_7cm_mean": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "weathercode": [
+            3,
+            45,
+            3,
+            3,
+            3,
+            51,
+            51
+          ],
+          "windspeed_10m_mean": [
+            5.4,
+            4.7,
+            5.9,
+            4.5,
+            13.4,
+            17.5,
+            9.0
+          ]
+        }
+      },
+      "threat-rating": 0.0479,
+      "calculated-threat-rating": 0.13401000000000002,
+      "nearby-towns": [],
+      "total-population": 0,
+      "total-value-estimate": 0
+    },
+    {
+      "coordinates": {
+        "lat": 36.07185,
+        "lng": -121.025527
+      },
+      "id": 3815892,
+      "last-burn-date": "2024-12-14",
+      "name": "Monterey County, California, USA",
+      "statistics": {
+        "safety": 0.5,
+        "fire-behavior": 0.8,
+        "resistance-to-containment": 0.8,
+        "ignition-procedures-and-methods": 0.5,
+        "prescribed-fire-duration": 0.5,
+        "smoke-management": 0.5,
+        "number-and-dependence-of-activities": 0.5,
+        "management-organizations": 0.2,
+        "treatment-resource-objectives": 0.5,
+        "constraints": 0.5,
+        "project-logistics": 0.8
+      },
+      "preliminary-feasability-score": 0.44499999999999995,
+      "weather": {
+        "latitude": 36.075886,
+        "longitude": -121.040565,
+        "generationtime_ms": 0.4990100860595703,
+        "utc_offset_seconds": -28800,
+        "timezone": "America/Los_Angeles",
+        "timezone_abbreviation": "GMT-8",
+        "elevation": 169.0,
+        "daily_units": {
+          "time": "iso8601",
+          "temperature_2m_mean": "\u00b0F",
+          "soil_moisture_0_to_7cm_mean": "undefined",
+          "weathercode": "wmo code",
+          "windspeed_10m_mean": "km/h"
+        },
+        "daily": {
+          "time": [
+            "2025-11-08",
+            "2025-11-09",
+            "2025-11-10",
+            "2025-11-11",
+            "2025-11-12",
+            "2025-11-13",
+            "2025-11-14"
+          ],
+          "temperature_2m_mean": [
+            64.2,
+            67.2,
+            67.6,
+            69.9,
+            64.1,
+            58.1,
+            51.1
+          ],
+          "soil_moisture_0_to_7cm_mean": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "weathercode": [
+            45,
+            0,
+            3,
+            3,
+            45,
+            53,
+            51
+          ],
+          "windspeed_10m_mean": [
+            5.7,
+            7.5,
+            3.1,
+            4.8,
+            14.6,
+            20.1,
+            3.6
+          ]
+        }
+      },
+      "threat-rating": 0.0441,
+      "calculated-threat-rating": 0.11419,
+      "nearby-towns": [],
+      "total-population": 0,
+      "total-value-estimate": 0
+    },
+    {
+      "coordinates": {
+        "lat": 41.497675,
+        "lng": -123.666574
+      },
+      "id": 5270572,
+      "last-burn-date": "2024-04-21",
+      "name": "Del Norte County, California, USA",
+      "statistics": {
+        "safety": 0.2,
+        "fire-behavior": 0.5,
+        "resistance-to-containment": 0.5,
+        "ignition-procedures-and-methods": 0.5,
+        "prescribed-fire-duration": 0.5,
+        "smoke-management": 0.2,
+        "number-and-dependence-of-activities": 0.5,
+        "management-organizations": 0.5,
+        "treatment-resource-objectives": 0.5,
+        "constraints": 0.5,
+        "project-logistics": 0.5
+      },
+      "preliminary-feasability-score": 0.5549999999999999,
+      "weather": {
+        "latitude": 41.527855,
+        "longitude": -123.659775,
+        "generationtime_ms": 0.6930828094482422,
+        "utc_offset_seconds": -28800,
+        "timezone": "America/Los_Angeles",
+        "timezone_abbreviation": "GMT-8",
+        "elevation": 1313.0,
+        "daily_units": {
+          "time": "iso8601",
+          "temperature_2m_mean": "\u00b0F",
+          "soil_moisture_0_to_7cm_mean": "undefined",
+          "weathercode": "wmo code",
+          "windspeed_10m_mean": "km/h"
+        },
+        "daily": {
+          "time": [
+            "2025-11-08",
+            "2025-11-09",
+            "2025-11-10",
+            "2025-11-11",
+            "2025-11-12",
+            "2025-11-13",
+            "2025-11-14"
+          ],
+          "temperature_2m_mean": [
+            49.1,
+            56.8,
+            54.8,
+            50.2,
+            47.9,
+            36.6,
+            31.2
+          ],
+          "soil_moisture_0_to_7cm_mean": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "weathercode": [
+            3,
+            3,
+            3,
+            3,
+            61,
+            85,
+            51
+          ],
+          "windspeed_10m_mean": [
+            12.7,
+            6.4,
+            4.4,
+            3.9,
+            6.3,
+            5.5,
+            4.5
+          ]
+        }
+      },
+      "threat-rating": 0.0438,
+      "calculated-threat-rating": 0.12492,
+      "nearby-towns": [],
+      "total-population": 0,
+      "total-value-estimate": 0
+    },
+    {
+      "coordinates": {
+        "lat": 34.580647,
+        "lng": -118.402446
+      },
+      "id": 3353914,
+      "last-burn-date": "2021-04-20",
+      "name": "Bouquet Canyon Reservoir Road, Green Valley, Los Angeles County, California, 91390, USA",
+      "statistics": {
+        "safety": 0.5,
+        "fire-behavior": 0.5,
+        "resistance-to-containment": 0.8,
+        "ignition-procedures-and-methods": 0.5,
+        "prescribed-fire-duration": 0.5,
+        "smoke-management": 0.2,
+        "number-and-dependence-of-activities": 0.2,
+        "management-organizations": 0.5,
+        "treatment-resource-objectives": 0.5,
+        "constraints": 0.5,
+        "project-logistics": 0.8
+      },
+      "preliminary-feasability-score": 0.5,
+      "weather": {
+        "latitude": 34.578667,
+        "longitude": -118.41225,
+        "generationtime_ms": 0.6417036056518555,
+        "utc_offset_seconds": -28800,
+        "timezone": "America/Los_Angeles",
+        "timezone_abbreviation": "GMT-8",
+        "elevation": 977.0,
+        "daily_units": {
+          "time": "iso8601",
+          "temperature_2m_mean": "\u00b0F",
+          "soil_moisture_0_to_7cm_mean": "undefined",
+          "weathercode": "wmo code",
+          "windspeed_10m_mean": "km/h"
+        },
+        "daily": {
+          "time": [
+            "2025-11-08",
+            "2025-11-09",
+            "2025-11-10",
+            "2025-11-11",
+            "2025-11-12",
+            "2025-11-13",
+            "2025-11-14"
+          ],
+          "temperature_2m_mean": [
+            63.6,
+            65.6,
+            65.8,
+            64.9,
+            60.7,
+            52.7,
+            45.4
+          ],
+          "soil_moisture_0_to_7cm_mean": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "weathercode": [
+            0,
+            0,
+            3,
+            3,
+            3,
+            51,
+            3
+          ],
+          "windspeed_10m_mean": [
+            23.6,
+            24.0,
+            15.2,
+            10.5,
+            15.2,
+            14.9,
+            12.8
+          ]
+        }
+      },
+      "threat-rating": 0.0428,
+      "calculated-threat-rating": 0.11852000000000001,
+      "nearby-towns": [],
+      "total-population": 0,
+      "total-value-estimate": 0
+    }
+  ]
 }
