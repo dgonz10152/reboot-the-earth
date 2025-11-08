@@ -137,7 +137,7 @@ def generate_v0_dummy_data():
     
     # Generate random burn area data
     burn_areas = []
-    for i in range(1):  # Generate 10 random burn areas
+    for i in range(5):  # Generate 10 random burn areas
         # Generate random coordinates (California area)
         lat = round(random.uniform(32.0, 42.0), 6)
         lng = round(random.uniform(-125.0, -114.0), 6)
@@ -237,9 +237,6 @@ def generate_v1_dummy_data():
         "Coastal Bay", "Prairie Town", "Timberland", "Silver Lake"
     ]
 
-    stat_values = list(statistics.values())
-    preliminary_feasability_score = round(sum(stat_values) / len(stat_values), 3)
-
     threat_rating = random.uniform(0.0, 1.0)
 
 
@@ -278,10 +275,11 @@ def generate_v1_dummy_data():
         
         # Calculate preliminary feasibility score (average of all statistics)
         stat_values = list(statistics.values())
-        preliminary_feasability_score = round(sum(stat_values) / len(stat_values), 3)
+        # Clamp the score to ensure it's between 0 and 1
+        preliminary_feasability_score = (round(sum(stat_values) / len(stat_values), 3))
                 
         # Generate threat ratings (random predictions from malco model)
-        threat_rating = random.uniform(0.0, 1.0)
+        threat_rating = round(random.uniform(0.0, 1.0), 3)
         
         # Generate nearby towns (1-4 towns)
         num_towns = random.randint(1, 4)

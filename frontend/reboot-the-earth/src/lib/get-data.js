@@ -31,8 +31,12 @@ export async function getData(endpoint = "", options = {}) {
 			...options,
 			headers: {
 				"Content-Type": "application/json",
+				"Cache-Control": "no-cache, no-store, must-revalidate",
+				"Pragma": "no-cache",
+				"Expires": "0",
 				...options.headers,
 			},
+			cache: "no-store", // Prevent Next.js and browser caching
 		});
 
 		if (!response.ok) {

@@ -22,10 +22,12 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
 
 // Custom icon colors based on threat level
 const getThreatColor = (threatLevel) => {
-	if (threatLevel >= 5) return "#dc2626"; // red-600
-	if (threatLevel >= 4) return "#ea580c"; // orange-600
-	if (threatLevel >= 3) return "#f59e0b"; // amber-600
-	if (threatLevel >= 2) return "#84cc16"; // lime-600
+	// Normalize threat level to 0-10 scale if it's in 0-1 range
+	const normalizedLevel = threatLevel < 1 ? threatLevel * 10 : threatLevel;
+	if (normalizedLevel >= 8) return "#dc2626"; // red-600
+	if (normalizedLevel >= 6) return "#ea580c"; // orange-600
+	if (normalizedLevel >= 4) return "#f59e0b"; // amber-600
+	if (normalizedLevel >= 2) return "#84cc16"; // lime-600
 	return "#22c55e"; // green-600
 };
 
@@ -60,8 +62,12 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 					const Updater = ({ center, zoom }) => {
 						const map = reactLeaflet.useMap();
 						useEffect(() => {
-							if (center) {
-								map.setView(center, zoom);
+							if (center && map && map.setView) {
+								try {
+									map.setView(center, zoom);
+								} catch (error) {
+									console.error("Error updating map view:", error);
+								}
 							}
 						}, [map, center, zoom]);
 						return null;
@@ -98,27 +104,32 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 
 	// Create custom icon function
 	const createCustomIcon = (color, isSelected) => {
-		if (!L) return null;
-		const size = isSelected ? 32 : 28;
-		const borderWidth = isSelected ? 4 : 3;
-		return L.divIcon({
-			className: `custom-marker ${isSelected ? "selected" : ""}`,
-			html: `<div style="
-				background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
-				width: ${size}px;
-				height: ${size}px;
-				border-radius: 50% 50% 50% 0;
-				transform: rotate(-45deg);
-				border: ${borderWidth}px solid ${isSelected ? "#ffffff" : "#ffffff"};
-				box-shadow: 0 4px 12px rgba(0,0,0,0.25), 0 0 0 ${
-					isSelected ? "8px" : "0px"
-				} ${color}40;
-				transition: all 0.3s ease;
-				cursor: pointer;
-			"></div>`,
-			iconSize: [size, size],
-			iconAnchor: [size / 2, size],
-		});
+		if (!L || !L.divIcon) return null;
+		try {
+			const size = isSelected ? 32 : 28;
+			const borderWidth = isSelected ? 4 : 3;
+			return L.divIcon({
+				className: `custom-marker ${isSelected ? "selected" : ""}`,
+				html: `<div style="
+					background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
+					width: ${size}px;
+					height: ${size}px;
+					border-radius: 50% 50% 50% 0;
+					transform: rotate(-45deg);
+					border: ${borderWidth}px solid ${isSelected ? "#ffffff" : "#ffffff"};
+					box-shadow: 0 4px 12px rgba(0,0,0,0.25), 0 0 0 ${
+						isSelected ? "8px" : "0px"
+					} ${color}40;
+					transition: all 0.3s ease;
+					cursor: pointer;
+				"></div>`,
+				iconSize: [size, size],
+				iconAnchor: [size / 2, size],
+			});
+		} catch (error) {
+			console.error("Error creating custom icon:", error);
+			return null;
+		}
 	};
 
 	if (!areas || areas.length === 0) {
@@ -141,11 +152,15 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 	return (
 		<div className="flex-1 rounded-lg border border-border overflow-hidden shadow-lg">
 			<MapContainer
+				key={`map-${centerPoint[0]}-${centerPoint[1]}`}
 				center={centerPoint}
 				zoom={mapZoom}
 				style={{ height: "100%", width: "100%", zIndex: 0 }}
 				scrollWheelZoom={true}
 				zoomControl={true}
+				whenReady={() => {
+					// Map is ready, ensure proper initialization
+				}}
 			>
 				<TileLayer
 					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
@@ -154,8 +169,13 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 				/>
 				{areas.map((area) => {
 					const isSelected = area.id === selectedAreaId;
-					const color = getThreatColor(area.threatLevel);
+					const threatRating = area["calculated-threat-rating"];
+					const normalizedRating = threatRating < 1 ? threatRating * 10 : threatRating;
+					const color = getThreatColor(normalizedRating);
 					const icon = createCustomIcon(color, isSelected);
+
+					// Skip rendering marker if icon creation failed
+					if (!icon) return null;
 
 					return (
 						<Marker
@@ -181,29 +201,39 @@ export function BurnMap({ areas, selectedAreaId, onSelectArea }) {
 									<div className="space-y-1.5">
 										<div className="flex items-center gap-2">
 											<span className="text-xs font-medium text-muted-foreground">
-												Threat Level:
+												Threat Rating:
 											</span>
 											<span
 												className="text-xs font-semibold px-2 py-0.5 rounded-full"
 												style={{
-													backgroundColor: `${getThreatColor(area.threatLevel)}20`,
-													color: getThreatColor(area.threatLevel),
+													backgroundColor: `${getThreatColor(normalizedRating)}20`,
+													color: getThreatColor(normalizedRating),
 												}}
 											>
-												{area.threatLevel}/5
+												{normalizedRating.toFixed(2)}/10
 											</span>
 										</div>
 										<p className="text-xs text-muted-foreground">
-											<span className="font-medium">Region:</span> {area.region}
+											<span className="font-medium">Feasibility:</span> {(() => {
+												const score = area["preliminary-feasability-score"];
+												// Normalize from 0-1 to 1-10 scale: (value * 9) + 1
+												const normalized = score < 1 ? (score * 9) + 1 : score;
+												return normalized.toFixed(2);
+											})()}/10
 										</p>
 										<p className="text-xs text-muted-foreground">
 											<span className="font-medium">Last Burn:</span>{" "}
-											{new Date(area.lastBurnDate).toLocaleDateString("en-US", {
+											{new Date(area["last-burn-date"]).toLocaleDateString("en-US", {
 												year: "numeric",
 												month: "short",
 												day: "numeric",
 											})}
 										</p>
+										{area["nearby-towns"] && area["nearby-towns"].length > 0 && (
+											<p className="text-xs text-muted-foreground">
+												<span className="font-medium">Nearby:</span> {area["nearby-towns"].map(t => t.name).join(", ")}
+											</p>
+										)}
 									</div>
 								</div>
 							</Popup>

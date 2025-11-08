@@ -22,10 +22,12 @@ export function BurnAreasSidebar({
   const filteredAreas = areas.filter((area) => area.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
   const getThreatColor = (level) => {
-    if (level === 1) return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-    if (level === 2) return "bg-green-500/20 text-green-400 border-green-500/30"
-    if (level === 3) return "bg-amber-500/20 text-amber-400 border-amber-500/30"
-    if (level === 4) return "bg-orange-500/20 text-orange-400 border-orange-500/30"
+    // Normalize level to 0-10 scale if it's in 0-1 range
+    const normalizedLevel = level < 1 ? level * 10 : level;
+    if (normalizedLevel <= 2) return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+    if (normalizedLevel <= 4) return "bg-green-500/20 text-green-400 border-green-500/30"
+    if (normalizedLevel <= 6) return "bg-amber-500/20 text-amber-400 border-amber-500/30"
+    if (normalizedLevel <= 8) return "bg-orange-500/20 text-orange-400 border-orange-500/30"
     return "bg-red-500/20 text-red-400 border-red-500/30"
   }
 
@@ -83,11 +85,11 @@ export function BurnAreasSidebar({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Threats</SelectItem>
-              <SelectItem value="5">Critical (5)</SelectItem>
-              <SelectItem value="4">High (4)</SelectItem>
-              <SelectItem value="3">Moderate (3)</SelectItem>
-              <SelectItem value="2">Low (2)</SelectItem>
-              <SelectItem value="1">Very Low (1)</SelectItem>
+              <SelectItem value="10">Critical (10)</SelectItem>
+              <SelectItem value="8">High (8-9)</SelectItem>
+              <SelectItem value="6">Moderate (6-7)</SelectItem>
+              <SelectItem value="4">Low (4-5)</SelectItem>
+              <SelectItem value="2">Very Low (0-3)</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -98,7 +100,7 @@ export function BurnAreasSidebar({
           {filteredAreas.map((area) => (
             <AccordionItem
               key={area.id}
-              value={area.id}
+              value={String(area.id)}
               className={cn(
                 "border-b border-border px-6",
                 selectedAreaId === area.id && "bg-accent/50"
@@ -110,29 +112,53 @@ export function BurnAreasSidebar({
                   </div>
                   <Badge
                     variant="outline"
-                    className={cn("text-xs font-medium border", getThreatColor(area.threatLevel))}>
-                    {area.threatLevel}
+                    className={cn("text-xs font-medium border", getThreatColor(area["calculated-threat-rating"]))}>
+                    {(() => {
+                      const rating = area["calculated-threat-rating"];
+                      const normalized = rating < 1 ? rating * 10 : rating;
+                      return normalized.toFixed(2);
+                    })()}
                   </Badge>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4">
                 <div className="space-y-3 pt-2">
-                  {/* Threat Breakdown */}
+                  {/* Statistics */}
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground">Threat Breakdown</p>
+                    <p className="text-xs font-medium text-muted-foreground">Statistics</p>
                     <div className="grid grid-cols-2 gap-2">
-                      <StatBadge label="Dryness" value={area.statistics.dryness} />
-                      <StatBadge label="Fuel Load" value={area.statistics.fuelLoad} />
-                      <StatBadge label="Wind" value={area.statistics.windSpeed} />
-                      <StatBadge label="Vegetation" value={area.statistics.vegetationDensity} />
+                      <StatBadge label="Safety" value={area.statistics.safety} />
+                      <StatBadge label="Fire Behavior" value={area.statistics["fire-behavior"]} />
+                      <StatBadge label="Resistance" value={area.statistics["resistance-to-containment"]} />
+                      <StatBadge label="Ignition" value={area.statistics["ignition-procedures-and-methods"]} />
+                      <StatBadge label="Duration" value={area.statistics["prescribed-fire-duration"]} />
+                      <StatBadge label="Smoke Mgmt" value={area.statistics["smoke-management"]} />
+                      <StatBadge label="Activities" value={area.statistics["number-and-dependence-of-activities"]} />
+                      <StatBadge label="Organizations" value={area.statistics["management-organizations"]} />
+                      <StatBadge label="Objectives" value={area.statistics["treatment-resource-objectives"]} />
+                      <StatBadge label="Constraints" value={area.statistics.constraints} />
+                      <StatBadge label="Logistics" value={area.statistics["project-logistics"]} />
                     </div>
+                  </div>
+
+                  {/* Feasibility Score */}
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Feasibility Score</p>
+                    <p className="text-sm text-foreground font-semibold">
+                      {(() => {
+                        const score = area["preliminary-feasability-score"];
+                        // Normalize from 0-1 to 1-10 scale: (value * 9) + 1
+                        const normalized = score < 1 ? (score * 9) + 1 : score;
+                        return normalized.toFixed(2);
+                      })()}/10
+                    </p>
                   </div>
 
                   {/* Last Burn Date */}
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Last Burn Date</p>
                     <p className="text-sm text-foreground">
-                      {new Date(area.lastBurnDate).toLocaleDateString("en-US", {
+                      {new Date(area["last-burn-date"]).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
@@ -140,11 +166,31 @@ export function BurnAreasSidebar({
                     </p>
                   </div>
 
-                  {/* Weather Forecast */}
+                  {/* Weather */}
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Weather Forecast</p>
-                    <p className="text-sm text-foreground">{area.weatherForecast}</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Weather</p>
+                    <p className="text-sm text-foreground">
+                      {typeof area.weather === 'string' 
+                        ? area.weather 
+                        : area.weather?.daily 
+                          ? `Temp: ${area.weather.daily.temperature_2m_mean?.[0] || 'N/A'}°F, Wind: ${area.weather.daily.windspeed_10m_mean?.[0] || 'N/A'} mph`
+                          : 'Weather data unavailable'}
+                    </p>
                   </div>
+
+                  {/* Nearby Towns */}
+                  {area["nearby-towns"] && area["nearby-towns"].length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Nearby Towns</p>
+                      <div className="space-y-1">
+                        {area["nearby-towns"].map((town, idx) => (
+                          <p key={idx} className="text-sm text-foreground">
+                            {town.name} ({town.population.toLocaleString()})
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* View on Map Button */}
                   <Button
@@ -162,17 +208,28 @@ export function BurnAreasSidebar({
       </div>
       {/* Legend */}
       <div className="p-6 border-t border-border bg-card">
-        <p className="text-xs font-medium text-muted-foreground mb-3">Threat Levels</p>
+        <p className="text-xs font-medium text-muted-foreground mb-3">Threat Levels (0-10)</p>
         <div className="space-y-2">
-          {[1, 2, 3, 4, 5].map((level) => (
-            <div key={level} className="flex items-center gap-2">
-              <div
-                className={cn("w-3 h-3 rounded-full", getThreatColor(level).split(" ")[0])} />
-              <span className="text-xs text-foreground">
-                {level} - {getThreatLabel(level)}
-              </span>
-            </div>
-          ))}
+          <div className="flex items-center gap-2">
+            <div className={cn("w-3 h-3 rounded-full", getThreatColor(1).split(" ")[0])} />
+            <span className="text-xs text-foreground">0-2 - Very Low</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className={cn("w-3 h-3 rounded-full", getThreatColor(3).split(" ")[0])} />
+            <span className="text-xs text-foreground">3-4 - Low</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className={cn("w-3 h-3 rounded-full", getThreatColor(5).split(" ")[0])} />
+            <span className="text-xs text-foreground">5-6 - Moderate</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className={cn("w-3 h-3 rounded-full", getThreatColor(7).split(" ")[0])} />
+            <span className="text-xs text-foreground">7-8 - High</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className={cn("w-3 h-3 rounded-full", getThreatColor(9).split(" ")[0])} />
+            <span className="text-xs text-foreground">9-10 - Critical</span>
+          </div>
         </div>
       </div>
     </div>
@@ -183,16 +240,22 @@ function StatBadge({
   label,
   value
 }) {
+  // Convert value from 0-1 range to 0-10 range with 2 decimal places
+  // If value is already in 0-10 range (>= 1), use it as-is
+  const normalizedValue = value >= 1 ? value : value * 10;
+  const displayValue = normalizedValue.toFixed(2);
+  const numericValue = parseFloat(normalizedValue);
+  
   const getColor = (val) => {
-    if (val <= 2) return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-    if (val === 3) return "bg-amber-500/10 text-amber-400 border-amber-500/20"
+    if (val <= 4) return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+    if (val <= 6) return "bg-amber-500/10 text-amber-400 border-amber-500/20"
     return "bg-orange-500/10 text-orange-400 border-orange-500/20"
   }
 
   return (
-    <div className={cn("px-2 py-1 rounded border text-xs", getColor(value))}>
+    <div className={cn("px-2 py-1 rounded border text-xs", getColor(numericValue))}>
       <div className="font-medium">{label}</div>
-      <div className="font-semibold">{value}/5</div>
+      <div className="font-semibold">{displayValue}/10</div>
     </div>
   );
 }
