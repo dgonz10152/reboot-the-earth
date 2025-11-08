@@ -17,7 +17,7 @@ export default function DashboardPage() {
 			try {
 				// Add timestamp to bust cache
 				const timestamp = Date.now();
-				const data = await getData(`/v0?t=${timestamp}`);
+				const data = await getData(`/v1?t=${timestamp}`);
 
 				console.log("API Response:", data);
 				// Backend returns: { status: "success", data: [...] }

@@ -161,14 +161,11 @@ def location_to_neighbor_values(lat, lng):
     
 
     for i in locations:
-        print(i)
-
         i_lng = i.get("lng")
         i_lat = i.get("lat")
         pop = i.get("population")
         if pop != None:
             pop = int(i.get("population"))
-            print(pop)
         else:
             pop = 0
         county = get_county(lat, lng)
