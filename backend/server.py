@@ -217,7 +217,7 @@ def generate_v0_dummy_data():
             "weather": get_weather_data(lat, lng),
             "threat-rating": threat_rating,
             "calculated-threat-rating": calculate_threat_rating(preliminary_feasability_score, threat_rating, total_population, total_value_estimate),
-            "Nearby-towns": nearby_towns
+            "nearby-towns": nearby_towns
         }
         
         burn_areas.append(burn_area)
@@ -326,7 +326,7 @@ def generate_v1_dummy_data():
             "weather": get_weather_data(lat, lng),
             "threat-rating": threat_rating,
             "calculated-threat-rating": calculate_threat_rating(preliminary_feasability_score, threat_rating, total_population, total_value_estimate),
-            "Nearby-towns": nearby_towns
+            "nearby-towns": nearby_towns
         }
         
         burn_areas.append(burn_area)
