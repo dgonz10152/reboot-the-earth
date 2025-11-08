@@ -1,0 +1,267 @@
+{
+	"status": "success",
+	"data": [
+		{
+			"coordinates": {
+				"lat": 40.58654,
+				"lng": -122.391675
+			},
+			"id": 4938940,
+			"last-burn-date": "2025-06-17",
+			"name": "Market Street, Redding, Shasta County, California, 96001, USA",
+			"statistics": {
+				"safety": 0.2,
+				"fire-behavior": 0.5,
+				"resistance-to-containment": 0.5,
+				"ignition-procedures-and-methods": 0.2,
+				"prescribed-fire-duration": 0.2,
+				"smoke-management": 0.5,
+				"number-and-dependence-of-activities": 0.5,
+				"management-organizations": 0.5,
+				"treatment-resource-objectives": 0.5,
+				"constraints": 0.5,
+				"project-logistics": 0.5
+			},
+			"preliminary-feasability-score": 0.5820000000000001,
+			"weather": {
+				"latitude": 40.597637,
+				"longitude": -122.37954,
+				"generationtime_ms": 0.5407333374023438,
+				"utc_offset_seconds": -28800,
+				"timezone": "America/Los_Angeles",
+				"timezone_abbreviation": "GMT-8",
+				"elevation": 172.0,
+				"daily_units": {
+					"time": "iso8601",
+					"temperature_2m_mean": "\u00b0F",
+					"soil_moisture_0_to_7cm_mean": "undefined",
+					"weathercode": "wmo code",
+					"windspeed_10m_mean": "km/h"
+				},
+				"daily": {
+					"time": [
+						"2025-11-08",
+						"2025-11-09",
+						"2025-11-10",
+						"2025-11-11",
+						"2025-11-12",
+						"2025-11-13",
+						"2025-11-14"
+					],
+					"temperature_2m_mean": [59.9, 62.7, 63.1, 61.8, 59.0, 52.8, 46.1],
+					"soil_moisture_0_to_7cm_mean": [null, null, null, null, null, null, null],
+					"weathercode": [3, 3, 3, 3, 53, 81, 3],
+					"windspeed_10m_mean": [9.6, 5.1, 6.2, 5.0, 5.8, 17.8, 3.7]
+				}
+			},
+			"threat-rating": 0.222,
+			"calculated-threat-rating": 0.3092438774533369,
+			"nearby-towns": [
+				{
+					"name": "Redding",
+					"lat": 40.5863563,
+					"lng": -122.391675,
+					"population": 91582,
+					"value-estimate": 3465264864.864865
+				}
+			],
+			"total-population": 91582,
+			"total-value-estimate": 3465264864.864865
+		},
+		{
+			"coordinates": {
+				"lat": 40.58654,
+				"lng": -122.391675
+			},
+			"id": 4939011,
+			"last-burn-date": "2021-07-27",
+			"name": "Market Street, Redding, Shasta County, California, 96001, USA",
+			"statistics": {
+				"statistics": {
+					"safety": 0.5,
+					"fire-behavior": 0.5,
+					"resistance-to-containment": 0.8,
+					"ignition-procedures-and-methods": 0.5,
+					"prescribed-fire-duration": 0.5,
+					"smoke-management": 0.8,
+					"number-and-dependence-of-activities": 0.5,
+					"management-organizations": 0.5,
+					"treatment-resource-objectives": 0.5,
+					"constraints": 0.8,
+					"project-logistics": 0.5
+				}
+			},
+			"preliminary-feasability-score": 0.41800000000000004,
+			"weather": {
+				"latitude": 40.597637,
+				"longitude": -122.37954,
+				"generationtime_ms": 0.3660917282104492,
+				"utc_offset_seconds": -28800,
+				"timezone": "America/Los_Angeles",
+				"timezone_abbreviation": "GMT-8",
+				"elevation": 172.0,
+				"daily_units": {
+					"time": "iso8601",
+					"temperature_2m_mean": "\u00b0F",
+					"soil_moisture_0_to_7cm_mean": "undefined",
+					"weathercode": "wmo code",
+					"windspeed_10m_mean": "km/h"
+				},
+				"daily": {
+					"time": [
+						"2025-11-08",
+						"2025-11-09",
+						"2025-11-10",
+						"2025-11-11",
+						"2025-11-12",
+						"2025-11-13",
+						"2025-11-14"
+					],
+					"temperature_2m_mean": [59.9, 62.7, 63.1, 61.8, 59.0, 52.8, 46.1],
+					"soil_moisture_0_to_7cm_mean": [null, null, null, null, null, null, null],
+					"weathercode": [3, 3, 3, 3, 53, 81, 3],
+					"windspeed_10m_mean": [9.6, 5.1, 6.2, 5.0, 5.8, 17.8, 3.7]
+				}
+			},
+			"threat-rating": 0.581,
+			"calculated-threat-rating": 0.5441438774533368,
+			"nearby-towns": [
+				{
+					"name": "Redding",
+					"lat": 40.5863563,
+					"lng": -122.391675,
+					"population": 91582,
+					"value-estimate": 3465264864.864865
+				}
+			],
+			"total-population": 91582,
+			"total-value-estimate": 3465264864.864865
+		},
+		{
+			"coordinates": {
+				"lat": 36.778259,
+				"lng": -119.417931
+			},
+			"id": 3860803,
+			"last-burn-date": "2024-04-09",
+			"name": "Terrace Avenue, Minkler, Fresno County, California, 93657, USA",
+			"statistics": {
+				"safety": 0.2,
+				"fire-behavior": 0.2,
+				"resistance-to-containment": 0.2,
+				"ignition-procedures-and-methods": 0.2,
+				"prescribed-fire-duration": 0.2,
+				"smoke-management": 0.2,
+				"number-and-dependence-of-activities": 0.2,
+				"management-organizations": 0.2,
+				"treatment-resource-objectives": 0.2,
+				"constraints": 0.2,
+				"project-logistics": 0.2
+			},
+			"preliminary-feasability-score": 0.8,
+			"weather": {
+				"latitude": 36.765133,
+				"longitude": -119.425156,
+				"generationtime_ms": 0.5750656127929688,
+				"utc_offset_seconds": -28800,
+				"timezone": "America/Los_Angeles",
+				"timezone_abbreviation": "GMT-8",
+				"elevation": 144.0,
+				"daily_units": {
+					"time": "iso8601",
+					"temperature_2m_mean": "\u00b0F",
+					"soil_moisture_0_to_7cm_mean": "undefined",
+					"weathercode": "wmo code",
+					"windspeed_10m_mean": "km/h"
+				},
+				"daily": {
+					"time": [
+						"2025-11-08",
+						"2025-11-09",
+						"2025-11-10",
+						"2025-11-11",
+						"2025-11-12",
+						"2025-11-13",
+						"2025-11-14"
+					],
+					"temperature_2m_mean": [62.5, 67.1, 68.7, 68.3, 67.8, 59.5, 52.1],
+					"soil_moisture_0_to_7cm_mean": [null, null, null, null, null, null, null],
+					"weathercode": [2, 0, 3, 3, 3, 55, 51],
+					"windspeed_10m_mean": [4.9, 5.6, 5.7, 4.9, 6.6, 10.8, 7.2]
+				}
+			},
+			"threat-rating": 0.271,
+			"calculated-threat-rating": 0.35390000000000005,
+			"nearby-towns": [],
+			"total-population": 0,
+			"total-value-estimate": 0
+		},
+		{
+			"coordinates": {
+				"lat": 36.737797,
+				"lng": -119.787125
+			},
+			"id": 3877691,
+			"last-burn-date": "2025-02-19",
+			"name": "Mariposa Street, Fresno, Fresno County, California, 93721, USA",
+			"statistics": {
+				"safety": 0.8,
+				"fire-behavior": 0.5,
+				"resistance-to-containment": 0.5,
+				"ignition-procedures-and-methods": 0.5,
+				"prescribed-fire-duration": 0.5,
+				"smoke-management": 0.8,
+				"number-and-dependence-of-activities": 0.5,
+				"management-organizations": 0.5,
+				"treatment-resource-objectives": 0.5,
+				"constraints": 0.8,
+				"project-logistics": 0.5
+			},
+			"preliminary-feasability-score": 0.41800000000000004,
+			"weather": {
+				"latitude": 36.74694,
+				"longitude": -119.80077,
+				"generationtime_ms": 0.3504753112792969,
+				"utc_offset_seconds": -28800,
+				"timezone": "America/Los_Angeles",
+				"timezone_abbreviation": "GMT-8",
+				"elevation": 91.0,
+				"daily_units": {
+					"time": "iso8601",
+					"temperature_2m_mean": "\u00b0F",
+					"soil_moisture_0_to_7cm_mean": "undefined",
+					"weathercode": "wmo code",
+					"windspeed_10m_mean": "km/h"
+				},
+				"daily": {
+					"time": [
+						"2025-11-08",
+						"2025-11-09",
+						"2025-11-10",
+						"2025-11-11",
+						"2025-11-12",
+						"2025-11-13",
+						"2025-11-14"
+					],
+					"temperature_2m_mean": [62.4, 65.2, 67.4, 72.9, 72.0, 61.7, 56.2],
+					"soil_moisture_0_to_7cm_mean": [null, null, null, null, null, null, null],
+					"weathercode": [3, 45, 3, 3, 3, 51, 51],
+					"windspeed_10m_mean": [4.3, 4.4, 4.4, 4.3, 11.1, 16.4, 8.3]
+				}
+			},
+			"threat-rating": 0.929,
+			"calculated-threat-rating": 1.1009535904836876,
+			"nearby-towns": [
+				{
+					"name": "Fresno",
+					"lat": 36.7394421,
+					"lng": -119.78483,
+					"population": 520052,
+					"value-estimate": 22720718446.601944
+				}
+			],
+			"total-population": 520052,
+			"total-value-estimate": 22720718446.601944
+		}
+	]
+}
